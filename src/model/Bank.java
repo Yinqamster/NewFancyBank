@@ -30,6 +30,8 @@ public class Bank{
 	private Map<String, String> accountList;
 	//transaction id
 	private List<String> transactionIdList;
+	//stocks
+	private List<Stock> stockList;
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
@@ -37,6 +39,8 @@ public class Bank{
 		currencyList = new HashMap<String, Currency>();
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
+		// added for security account and stock
+		stockList = new ArrayList<Stock>();
 		
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;
