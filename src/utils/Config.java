@@ -18,6 +18,7 @@ public class Config {
 	//account type
 	public static final int CHECKINGACCOUNT = 1;
 	public static final int SAVINGACCOUNT = 2;
+	public static final int SECURITYACCOUNT = 3;
 	
 	//log status
 	public static final int NOTLOGGEDIN = 1;
