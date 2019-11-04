@@ -73,6 +73,26 @@ public class SetConfig extends JFrame{
 		caf.setText(String.valueOf(bank.getCloseAccountFee()));
 //		caf.setHorizontalAlignment(SwingConstants.LEFT);
 		panel.add(caf);
+
+		//TODO add
+		JLabel purchaseStockFee = new JLabel("Purchase Stock Fee*：");
+		purchaseStockFee.setFont(new Font("Helvetica",Font.PLAIN,15));
+		panel.add(purchaseStockFee);
+		JTextField psf = new JTextField(10);
+		psf.setText(String.valueOf(bank.getCloseAccountFee()));
+		panel.add(psf);
+
+
+		JLabel securityThreshold = new JLabel("Security Threshold*：");
+		closeAccountFee.setFont(new Font("Helvetica",Font.PLAIN,15));
+		panel.add(securityThreshold);
+		JTextField st = new JTextField(10);
+		st.setText(String.valueOf(bank.getCloseAccountFee()));
+		panel.add(st);
+
+
+
+
 		
 		JLabel currency = new JLabel("Currency");
 //		currency.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -216,8 +236,8 @@ public class SetConfig extends JFrame{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				int res = managerController.saveConfig(oaf.getText(), caf.getText());
+				// TODO save config add psf and st
+				int res = managerController.saveConfig(oaf.getText(), caf.getText(), psf.getText(), st.getText());
 				if(res == ErrCode.OK) {
 					Object[] options = {"OK"};
 			        JOptionPane.showOptionDialog(null,  
