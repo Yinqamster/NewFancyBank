@@ -1,9 +1,5 @@
 # BankATM
 
-Qi Yin
-
-U31787103
-
 # How to run:
 The entrance of the program is controller/BankATM.java. You can run this program in src folder by
 
