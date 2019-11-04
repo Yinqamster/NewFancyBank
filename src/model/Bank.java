@@ -21,6 +21,9 @@ public class Bank{
 	private Map<String, BigDecimal> balance;
 	private BigDecimal closeAccountFee;
 	private BigDecimal openAccountFee;
+	// for security account and stock transaction
+	private BigDecimal stockTransactionFee;
+	private BigDecimal securityAccountThreshold;
 	
 	//userId, user
 	private Map<String, User> userList;
@@ -45,6 +48,9 @@ public class Bank{
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;
 		closeAccountFee = Config.DEFAULTCLOSEACCOUNTFEE;
+		// for security account and stock transaction
+		stockTransactionFee = Config.DEFAULTSTOCKCHARGERATE;
+		securityAccountThreshold = Config.DEFAULTSECURITYTHRESHOLD;
 		
 		CurrencyConfig currencyConfig  = new CurrencyConfig(
 				Config.DEFAULTSERVICECHARGERATE,
@@ -86,7 +92,23 @@ public class Bank{
 	public void setCloseAccountFee(BigDecimal close) {
 		this.closeAccountFee = close;
 	}
-	
+
+	public BigDecimal getStockTransactionFee() {
+		return stockTransactionFee;
+	}
+
+	public void setStockTransactionFee(BigDecimal stockTransactionFee) {
+		this.stockTransactionFee = stockTransactionFee;
+	}
+
+	public BigDecimal getSecurityAccountThreshold() {
+		return securityAccountThreshold;
+	}
+
+	public void setSecurityAccountThreshold(BigDecimal securityAccountThreshold) {
+		this.securityAccountThreshold = securityAccountThreshold;
+	}
+
 	public Map<String, User> getUserList() {
 		return this.userList;
 	}

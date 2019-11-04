@@ -47,6 +47,10 @@ public class Config {
 	public static final BigDecimal DEFAULTBALANCEFORINTEREST = new BigDecimal("500");
 	public static final BigDecimal DEFAULTOPENACCOUNTFEE = new BigDecimal("10");
 	public static final BigDecimal DEFAULTCLOSEACCOUNTFEE = new BigDecimal("50");
+	// for security account and stock transaction
+	public static final BigDecimal DEFAULTSECURITYTHRESHOLD = new BigDecimal("500");
+	public static final BigDecimal DEFAULTSTOCKCHARGERATE = new BigDecimal("0.05");
+
 	
 	
 	//number length
