@@ -323,12 +323,15 @@ public class BankController implements SystemInterface{
 		return ErrCode.OK;
 	}
 	
-	public int saveConfig(String open, String close) {
-		if(!UtilFunction.isNumber(open) || !UtilFunction.isNumber(close)) {
+	public int saveConfig(String open, String close, String stock, String threshold) {
+		if(!UtilFunction.isNumber(open) || !UtilFunction.isNumber(close) || !UtilFunction.isNumber(stock) ||
+			!UtilFunction.isNumber(threshold)) {
 			return ErrCode.INPUTNOTANUMBER;
 		}
 		bank.setOpenAccountFee(new BigDecimal(open));
 		bank.setCloseAccountFee(new BigDecimal(close));
+		bank.setStockTransactionFee(new BigDecimal(stock));
+		bank.setSecurityAccountThreshold(new BigDecimal(threshold));
 		return ErrCode.OK;
 	}
 	
