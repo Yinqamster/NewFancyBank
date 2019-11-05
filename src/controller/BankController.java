@@ -7,12 +7,11 @@
 package controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import model.*;
+import model.Currency;
+import model.Date;
 import utils.Config;
 import utils.ErrCode;
 import utils.UtilFunction;
@@ -381,6 +380,23 @@ public class BankController implements SystemInterface{
 		boolean successful = bank.addStock(stock);
 		if(!successful)
 			return ErrCode.STOCKEXIST;
+		return ErrCode.OK;
+	}
+
+	public int modifyStockPrice(String company, String modifyPriceStr) {
+		BigDecimal modifyPrice;
+		try {
+			modifyPrice = new BigDecimal(modifyPriceStr);
+		} catch (NumberFormatException e) {
+			return ErrCode.INPUTNOTANUMBER;
+		}
+		if(modifyPrice.compareTo(new BigDecimal("0")) == -1)
+			return ErrCode.ILLEGALINPUT;
+		Map<String, Stock> stockMap = bank.getStockMap();
+		if(!stockMap.containsKey(company))
+			return ErrCode.STOCKNOTEXIST;
+		Stock temp = new Stock(company, modifyPrice);
+		stockMap.put(company, temp);
 		return ErrCode.OK;
 	}
 }

@@ -31,7 +31,7 @@ public class Bank{
 	//transaction id
 	private List<String> transactionIdList;
 	//stocks
-	private Set<Stock> stockList;
+	private Map<String, Stock> stockMap;
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
@@ -40,7 +40,7 @@ public class Bank{
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
 		// added for security account and stock
-		stockList = new HashSet<Stock>();
+		stockMap = new HashMap<>();
 		
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;
@@ -139,7 +139,18 @@ public class Bank{
 	}
 
 	public boolean addStock(Stock stock) {
-		return this.stockList.add(stock);
+		if(stockMap.containsKey(stock.getCompany()))
+			return false;
+		else
+			stockMap.put(stock.getCompany(), stock);
+		return true;
 	}
-	
+
+	public Map<String, Stock> getStockMap() {
+		return stockMap;
+	}
+
+	public void setStockMap(Map<String, Stock> stockMap) {
+		this.stockMap = stockMap;
+	}
 }
