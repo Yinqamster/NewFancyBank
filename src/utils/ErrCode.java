@@ -53,6 +53,8 @@ public class ErrCode {
 
 	//Stock
 	public static final int STOCKEXIST = 501;
+	public static final int STOCKNOTEXIST = 502;
+	public static final int ILLEGALINPUT = 503;
 	
 	
 	public static String errCodeToStr(int errCode) {
@@ -166,7 +168,12 @@ public class ErrCode {
 		case STOCKEXIST:
 			errString = "Cannot Add an Existed Stock";
 			break;
-
+		case STOCKNOTEXIST:
+			errString = "Cannot Find This Stock";
+			break;
+		case ILLEGALINPUT:
+			errString = "Illegal Input";
+			break;
 		default:
 			errString = "Error. Please try later.";
 			break;
