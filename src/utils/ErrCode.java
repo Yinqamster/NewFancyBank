@@ -50,6 +50,9 @@ public class ErrCode {
 	//set config
 	public static final int CURRENCYISNULL = 401;
 	public static final int INPUTNOTANUMBER = 402;
+
+	//Stock
+	public static final int STOCKEXIST = 501;
 	
 	
 	public static String errCodeToStr(int errCode) {
@@ -159,6 +162,9 @@ public class ErrCode {
 			break;
 		case INPUTNOTANUMBER:
 			errString = "Not a Number. Please input a valid number.";
+			break;
+		case STOCKEXIST:
+			errString = "Cannot Add an Existed Stock";
 			break;
 
 		default:

@@ -14,9 +14,9 @@ public class User extends Person{
 
 	private String password;
 	private int status;
-	// account number, object
+	//account number, account
 	private Map<String, Account> accounts;
-	// loan name, object
+	//loan name, loan
 	private Map<String, Loan> loanList;
 	
 	public User(){

@@ -124,8 +124,45 @@ public class UserInterface extends JFrame{
 			accountPanel.add(transfer);
 			accountPanel.add(showDetail);
 		}
-		
-		
+
+
+		//TODO : add security account
+		List<String> securityAccount = userController.getAccountList(username, Config.SECURITYACCOUNT);
+		boolean hasSecurityAccount = securityAccount.size()==0 ? false : true;
+		int securityRows = securityAccount.size();
+		securityRows += hasSecurityAccount ? 4 : 2;
+		int securityPanelHeight = 25 * securityRows;
+
+		JPanel securityAccountPanel = new JPanel();
+		securityAccountPanel.setBounds(50, accountPanel.getY() + accountPanel.getHeight() + 20, 400, securityPanelHeight);
+		securityAccountPanel.setLayout(new GridLayout(rows, 2, 5, 5));
+		securityAccountPanel.setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
+
+		JLabel seacc = new JLabel("Security Account:");
+		seacc.setFont(new Font("Helvetica", Font.PLAIN, 15));
+		JButton createSeacc = new JButton("Create");
+		securityAccountPanel.add(seacc);
+		securityAccountPanel.add(createSeacc);
+
+		for(int i = 0; i < securityAccount.size(); i++) {
+			JLabel accNumL = new JLabel("Account number: ");
+			JLabel accNum = new JLabel(checkingAccounts.get(i));
+			securityAccountPanel.add(accNumL);
+			securityAccountPanel.add(accNum);
+		}
+
+		JButton buy = new JButton("Buy");
+		JButton sell = new JButton("Sell");
+		JButton AllStocks = new JButton("All Stocks");
+		JButton showStockDetail = new JButton("Show Details");
+		if(hasSecurityAccount) {
+			securityAccountPanel.add(buy);
+			securityAccountPanel.add(sell);
+			securityAccountPanel.add(AllStocks);
+			securityAccountPanel.add(showStockDetail);
+		}
+
+
 		Map<String,Loan> loanList = userController.getLoanList(username);
 		boolean hasLoan = loanList.size() == 0 ? false : true;
 		int loanRows = hasLoan ? 2 + loanList.size() : 1;

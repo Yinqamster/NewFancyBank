@@ -76,6 +76,7 @@ public class UserDetail extends JFrame{
 		User user = BankController.getBank().getUserList().get(username);
 		Map<String, Account> accounts = user.getAccounts();
 		Map<String, Loan> loans = user.getLoanList();
+		Map<String, Stock> stocks = user.getStockList();
 		
 		
 		JLabel IDLabel = new JLabel("ID: ");
@@ -102,7 +103,7 @@ public class UserDetail extends JFrame{
 		infoPanel.add(truenameLabel);
 		infoPanel.add(tname);
 		
-		JLabel sexLabel = new JLabel("Sex: ");
+		JLabel sexLabel = new JLabel("Gender: ");
 		sexLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		sexLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		JLabel sex = new JLabel(user.getSex() == Config.FEMALE ? "Female" : "Male");
@@ -363,8 +364,20 @@ public class UserDetail extends JFrame{
 			}
 			loanScrollPanel.setViewportView(loanPanel);
 		}
-		
-		
+
+
+		//TODO add stock
+		JPanel stockLabelPanel = new JPanel();
+		stockLabelPanel.setBounds(50, loanScrollPanel.getY() + loanScrollPanel.getHeight() + 20, 900, 25);
+		stockLabelPanel.setLayout(new GridLayout(1, 1, 10, 5));
+		JLabel stock = new JLabel("Stock: ");
+		stock.setFont(new Font("Helvetica", Font.PLAIN, 15));
+		stockLabelPanel.add(stock);
+
+		int stockRows = stocks == null || stocks.size() == 0 ? 0 : stocks.size() + 1;
+		JScrollPane stockScrollPanel = new JScrollPane();
+		int stockScrollPaneHeight = 30*stockRows > 150 ? 150 : 30*stockRows;
+		stockScrollPanel.setBounds(50, stockLabelPanel.getY() + stockLabelPanel.getHeight() + 5, 900, stockScrollPaneHeight);
 		
 		
 		contentPanel.add(titlePanel);
@@ -376,6 +389,8 @@ public class UserDetail extends JFrame{
 		contentPanel.add(transactionScrollPanel);
 		contentPanel.add(loanLabelPanel);
 		contentPanel.add(loanScrollPanel);
+		contentPanel.add(stockLabelPanel);
+		contentPanel.add(stockScrollPanel);
 		contentPanel.add(background);
 		
 		getContentPane().add(contentPanel);

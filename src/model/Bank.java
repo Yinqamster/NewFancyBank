@@ -6,10 +6,7 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import utils.Config;
 
@@ -21,6 +18,9 @@ public class Bank{
 	private Map<String, BigDecimal> balance;
 	private BigDecimal closeAccountFee;
 	private BigDecimal openAccountFee;
+	// for security account and stock transaction
+	private BigDecimal stockTransactionFee;
+	private BigDecimal securityAccountThreshold;
 	
 	//userId, user
 	private Map<String, User> userList;
@@ -31,7 +31,7 @@ public class Bank{
 	//transaction id
 	private List<String> transactionIdList;
 	//stocks
-	private List<Stock> stockList;
+	private Set<Stock> stockList;
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
@@ -40,11 +40,14 @@ public class Bank{
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
 		// added for security account and stock
-		stockList = new ArrayList<Stock>();
+		stockList = new HashSet<Stock>();
 		
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;
 		closeAccountFee = Config.DEFAULTCLOSEACCOUNTFEE;
+		// for security account and stock transaction
+		stockTransactionFee = Config.DEFAULTSTOCKCHARGERATE;
+		securityAccountThreshold = Config.DEFAULTSECURITYTHRESHOLD;
 		
 		CurrencyConfig currencyConfig  = new CurrencyConfig(
 				Config.DEFAULTSERVICECHARGERATE,
@@ -86,7 +89,23 @@ public class Bank{
 	public void setCloseAccountFee(BigDecimal close) {
 		this.closeAccountFee = close;
 	}
-	
+
+	public BigDecimal getStockTransactionFee() {
+		return stockTransactionFee;
+	}
+
+	public void setStockTransactionFee(BigDecimal stockTransactionFee) {
+		this.stockTransactionFee = stockTransactionFee;
+	}
+
+	public BigDecimal getSecurityAccountThreshold() {
+		return securityAccountThreshold;
+	}
+
+	public void setSecurityAccountThreshold(BigDecimal securityAccountThreshold) {
+		this.securityAccountThreshold = securityAccountThreshold;
+	}
+
 	public Map<String, User> getUserList() {
 		return this.userList;
 	}
@@ -117,6 +136,10 @@ public class Bank{
 	
 	public void addTransactionId(String transactionId) {
 		this.transactionIdList.add(transactionId);
+	}
+
+	public boolean addStock(Stock stock) {
+		return this.stockList.add(stock);
 	}
 	
 }
