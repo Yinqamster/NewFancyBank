@@ -6,10 +6,7 @@
 package model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import utils.Config;
 
@@ -34,7 +31,7 @@ public class Bank{
 	//transaction id
 	private List<String> transactionIdList;
 	//stocks
-	private List<Stock> stockList;
+	private Set<Stock> stockList;
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
@@ -43,7 +40,7 @@ public class Bank{
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
 		// added for security account and stock
-		stockList = new ArrayList<Stock>();
+		stockList = new HashSet<Stock>();
 		
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;
@@ -139,6 +136,10 @@ public class Bank{
 	
 	public void addTransactionId(String transactionId) {
 		this.transactionIdList.add(transactionId);
+	}
+
+	public boolean addStock(Stock stock) {
+		return this.stockList.add(stock);
 	}
 	
 }

@@ -12,16 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import model.Account;
-import model.Bank;
-import model.Currency;
-import model.CurrencyConfig;
-import model.DailyReport;
-import model.Date;
-import model.Name;
-import model.SavingAccount;
-import model.Transaction;
-import model.User;
+import model.*;
 import utils.Config;
 import utils.ErrCode;
 import utils.UtilFunction;
@@ -378,4 +369,18 @@ public class BankController implements SystemInterface{
         
         return ErrCode.OK;
     }
+
+	public int addNewStock(String company, String unitPriceStr) {
+		BigDecimal unitPrice;
+		try {
+			unitPrice = new BigDecimal(unitPriceStr);
+		} catch (NumberFormatException e) {
+			return ErrCode.INPUTNOTANUMBER;
+		}
+		Stock stock = new Stock(company, unitPrice);
+		boolean successful = bank.addStock(stock);
+		if(!successful)
+			return ErrCode.STOCKEXIST;
+		return ErrCode.OK;
+	}
 }
