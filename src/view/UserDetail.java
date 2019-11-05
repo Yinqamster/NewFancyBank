@@ -28,12 +28,7 @@ import javax.swing.SwingConstants;
 
 import controller.BankController;
 import controller.UserController;
-import model.Account;
-import model.CheckingAccount;
-import model.Loan;
-import model.SavingAccount;
-import model.Transaction;
-import model.User;
+import model.*;
 import utils.Config;
 import utils.ErrCode;
 
@@ -76,7 +71,7 @@ public class UserDetail extends JFrame{
 		User user = BankController.getBank().getUserList().get(username);
 		Map<String, Account> accounts = user.getAccounts();
 		Map<String, Loan> loans = user.getLoanList();
-		Map<String, Stock> stocks = user.getStockList();
+//		Map<String, Stock> stocks = user.getStockList();
 		
 		
 		JLabel IDLabel = new JLabel("ID: ");
@@ -181,47 +176,90 @@ public class UserDetail extends JFrame{
 		else if(selectedAccount instanceof SavingAccount) {
 			aTypeLabel.setText("Saving Account");
 		}
+		else if(selectedAccount instanceof  SecurityAccount) {
+			aTypeLabel.setText("Security Account");
+		}
 		aTypeLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		accountTitlePanel.add(accountType);
 		accountTitlePanel.add(aTypeLabel);
-		
-		
-		
+
 		JPanel balanceLabelPanel = new JPanel();
 		balanceLabelPanel.setBounds(50, accountTitlePanel.getY() + accountTitlePanel.getHeight() + 20, 900, 25);
 		balanceLabelPanel.setLayout(new GridLayout(1, 1, 10, 5));
 		JLabel balance = new JLabel("Balance: ");
 		balance.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		balanceLabelPanel.add(balance);
-		
-		Map<String, BigDecimal> balanceList = selectedAccount.getBalance();
-		int balancePanelRows = balanceList == null || balanceList.size() == 0 ? 0 : balanceList.size() + 1;
 		JScrollPane balanceScrollPanel = new JScrollPane();
-		int balanceScrollPaneHeight = 25*balancePanelRows > 100 ? 100 : 25*balancePanelRows;
-		balanceScrollPanel.setBounds(50, balanceLabelPanel.getY() + balanceLabelPanel.getHeight() + 5, 900, balanceScrollPaneHeight);
-		
-		if(balanceList != null && balanceList.size() != 0) {
-			JPanel balancePanel = new JPanel();
-			balancePanel.setLayout(new GridLayout(balancePanelRows, 2, 10, 5));
-		
-			JLabel currency = new JLabel("Currency: ");
-			currency.setFont(new Font("Helvetica", Font.PLAIN, 15));
-			JLabel amount = new JLabel("Amount: ");
-			amount.setFont(new Font("Helvetica", Font.PLAIN, 15));
-			balancePanel.add(currency);
-			balancePanel.add(amount);
-			for(Map.Entry<String, BigDecimal> b : balanceList.entrySet()) {
-				JLabel curr = new JLabel(b.getKey());
-				JLabel num = new JLabel(String.valueOf(b.getValue()));
-				balancePanel.add(curr);
-				balancePanel.add(num);
+
+		JPanel stockLabelPanel = new JPanel();
+		stockLabelPanel.setBounds(50, accountTitlePanel.getY() + accountTitlePanel.getHeight() + 20, 900, 25);
+		stockLabelPanel.setLayout(new GridLayout(1, 1, 10, 5));
+		JLabel stock = new JLabel("Stock: ");
+		stock.setFont(new Font("Helvetica", Font.PLAIN, 15));
+		stockLabelPanel.add(stock);
+		JScrollPane stockScrollPanel = new JScrollPane();
+
+		int transactionLabelPanelHeight = 0;
+
+		if(selectedAccount instanceof CheckingAccount || selectedAccount instanceof SavingAccount) {
+			Map<String, BigDecimal> balanceList = selectedAccount.getBalance();
+			int balancePanelRows = balanceList == null || balanceList.size() == 0 ? 0 : balanceList.size() + 1;
+
+			int balanceScrollPaneHeight = 25 * balancePanelRows > 100 ? 100 : 25 * balancePanelRows;
+			balanceScrollPanel.setBounds(50, balanceLabelPanel.getY() + balanceLabelPanel.getHeight() + 5, 900, balanceScrollPaneHeight);
+
+			if (balanceList != null && balanceList.size() != 0) {
+				JPanel balancePanel = new JPanel();
+				balancePanel.setLayout(new GridLayout(balancePanelRows, 2, 10, 5));
+
+				JLabel currency = new JLabel("Currency: ");
+				currency.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				JLabel amount = new JLabel("Amount: ");
+				amount.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				balancePanel.add(currency);
+				balancePanel.add(amount);
+				for (Map.Entry<String, BigDecimal> b : balanceList.entrySet()) {
+					JLabel curr = new JLabel(b.getKey());
+					JLabel num = new JLabel(String.valueOf(b.getValue()));
+					balancePanel.add(curr);
+					balancePanel.add(num);
+				}
+				balanceScrollPanel.setViewportView(balancePanel);
 			}
-			balanceScrollPanel.setViewportView(balancePanel);
+			transactionLabelPanelHeight = balanceScrollPanel.getY() + balanceScrollPanel.getHeight() + 20;
 		}
-		
-		
+		else if(selectedAccount instanceof SecurityAccount) {
+			Map<String, Map<Stock, Integer>> stockList = ((SecurityAccount) selectedAccount).getStockList();
+			int stockPanelRows = stockList == null || stockList.size() == 0 ? 0 : stockList.size() + 1;
+
+			int stockScrollPaneHeight = 25 * stockPanelRows > 100 ? 100 : 25 * stockPanelRows;
+			stockScrollPanel.setBounds(50, stockLabelPanel.getY() + stockLabelPanel.getHeight() + 5, 900, stockScrollPaneHeight);
+
+			if (stockList != null && stockList.size() != 0) {
+				JPanel stockPanel = new JPanel();
+				stockPanel.setLayout(new GridLayout(stockPanelRows, 2, 10, 5));
+
+				JLabel company = new JLabel("Company: ");
+				company.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				JLabel amount = new JLabel("Amount: ");
+				amount.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				stockPanel.add(company);
+				stockPanel.add(amount);
+//			for(Map.Entry<String, BigDecimal> b : balanceList.entrySet()) {
+//				JLabel curr = new JLabel(b.getKey());
+//				JLabel num = new JLabel(String.valueOf(b.getValue()));
+//				balancePanel.add(curr);
+//				balancePanel.add(num);
+//			}
+				stockScrollPanel.setViewportView(stockPanel);
+			}
+			transactionLabelPanelHeight = stockScrollPanel.getY() + stockScrollPanel.getHeight() + 20;
+		}
+
+
 		JPanel transactionLabelPanel = new JPanel();
-		transactionLabelPanel.setBounds(50, balanceScrollPanel.getY() + balanceScrollPanel.getHeight() + 20, 900, 25);
+
+		transactionLabelPanel.setBounds(50, transactionLabelPanelHeight, 900, 25);
 		transactionLabelPanel.setLayout(new GridLayout(1, 1, 10, 5));
 		JLabel transaction = new JLabel("Transaction: ");
 		transaction.setFont(new Font("Helvetica", Font.PLAIN, 15));
@@ -366,25 +404,19 @@ public class UserDetail extends JFrame{
 		}
 
 
-		//TODO add stock
-		JPanel stockLabelPanel = new JPanel();
-		stockLabelPanel.setBounds(50, loanScrollPanel.getY() + loanScrollPanel.getHeight() + 20, 900, 25);
-		stockLabelPanel.setLayout(new GridLayout(1, 1, 10, 5));
-		JLabel stock = new JLabel("Stock: ");
-		stock.setFont(new Font("Helvetica", Font.PLAIN, 15));
-		stockLabelPanel.add(stock);
 
-		int stockRows = stocks == null || stocks.size() == 0 ? 0 : stocks.size() + 1;
-		JScrollPane stockScrollPanel = new JScrollPane();
-		int stockScrollPaneHeight = 30*stockRows > 150 ? 150 : 30*stockRows;
-		stockScrollPanel.setBounds(50, stockLabelPanel.getY() + stockLabelPanel.getHeight() + 5, 900, stockScrollPaneHeight);
-		
-		
+
 		contentPanel.add(titlePanel);
 		contentPanel.add(infoPanel);
 		contentPanel.add(accountTitlePanel);
-		contentPanel.add(balanceLabelPanel);
-		contentPanel.add(balanceScrollPanel);
+		if(selectedAccount instanceof CheckingAccount || selectedAccount instanceof  SavingAccount) {
+			contentPanel.add(balanceLabelPanel);
+			contentPanel.add(balanceScrollPanel);
+		}
+		else if(selectedAccount instanceof SecurityAccount) {
+			contentPanel.add(stockLabelPanel);
+			contentPanel.add(stockScrollPanel);
+		}
 		contentPanel.add(transactionLabelPanel);
 		contentPanel.add(transactionScrollPanel);
 		contentPanel.add(loanLabelPanel);

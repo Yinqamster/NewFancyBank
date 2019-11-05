@@ -52,7 +52,9 @@ public class Config {
 	public static final BigDecimal DEFAULTSECURITYTHRESHOLD = new BigDecimal("500");
 	public static final BigDecimal DEFAULTSTOCKCHARGERATE = new BigDecimal("0.05");
 
-	
+	//stock transaction type
+	public static final int BUY = 1;
+	public static final int SELL = 2;
 	
 	//number length
 	public static final int ACCOUNTNUMBERLENGTH = 12;

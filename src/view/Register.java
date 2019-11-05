@@ -90,7 +90,7 @@ public class Register extends JFrame {
 		uname.setHorizontalAlignment(SwingConstants.LEFT);
 		panel.add(uname);
 		
-		JLabel sex = new JLabel("Sex*:");
+		JLabel sex = new JLabel("Gender*:");
 		sex.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel.add(sex);
 		sex.setFont(new Font("Helvetica",Font.PLAIN,15));

@@ -128,14 +128,14 @@ public class UserInterface extends JFrame{
 
 		//TODO : add security account
 		List<String> securityAccount = userController.getAccountList(username, Config.SECURITYACCOUNT);
-		boolean hasSecurityAccount = securityAccount.size()==0 ? false : true;
+		boolean hasSecurityAccount = securityAccount == null || securityAccount.size()==0 ? false : true;
 		int securityRows = securityAccount.size();
-		securityRows += hasSecurityAccount ? 4 : 2;
+		securityRows += hasSecurityAccount ? 2 : 1;
 		int securityPanelHeight = 25 * securityRows;
 
 		JPanel securityAccountPanel = new JPanel();
-		securityAccountPanel.setBounds(50, accountPanel.getY() + accountPanel.getHeight() + 20, 400, securityPanelHeight);
-		securityAccountPanel.setLayout(new GridLayout(rows, 2, 5, 5));
+		securityAccountPanel.setBounds(50, accountPanel.getY() + accountPanel.getHeight() + 5, 400, securityPanelHeight);
+		securityAccountPanel.setLayout(new GridLayout(securityRows, 2, 5, 5));
 		securityAccountPanel.setBorder(new LineBorder(Color.DARK_GRAY, 1, true));
 
 		JLabel seacc = new JLabel("Security Account:");
@@ -146,19 +146,19 @@ public class UserInterface extends JFrame{
 
 		for(int i = 0; i < securityAccount.size(); i++) {
 			JLabel accNumL = new JLabel("Account number: ");
-			JLabel accNum = new JLabel(checkingAccounts.get(i));
+			JLabel accNum = new JLabel(securityAccount.get(i));
 			securityAccountPanel.add(accNumL);
 			securityAccountPanel.add(accNum);
 		}
 
-		JButton buy = new JButton("Buy");
-		JButton sell = new JButton("Sell");
-		JButton AllStocks = new JButton("All Stocks");
+//		JButton buy = new JButton("Buy");
+//		JButton sell = new JButton("Sell");
+		JButton allStocks = new JButton("Stocks Market");
 		JButton showStockDetail = new JButton("Show Details");
 		if(hasSecurityAccount) {
-			securityAccountPanel.add(buy);
-			securityAccountPanel.add(sell);
-			securityAccountPanel.add(AllStocks);
+//			securityAccountPanel.add(buy);
+//			securityAccountPanel.add(sell);
+			securityAccountPanel.add(allStocks);
 			securityAccountPanel.add(showStockDetail);
 		}
 
@@ -167,7 +167,7 @@ public class UserInterface extends JFrame{
 		boolean hasLoan = loanList.size() == 0 ? false : true;
 		int loanRows = hasLoan ? 2 + loanList.size() : 1;
 		int loanPanelHeight = 25 * loanRows;
-		int YBegin = accountPanel.getY()+accountPanel.getHeight() + 5;
+		int YBegin = securityAccountPanel.getY()+securityAccountPanel.getHeight() + 5;
 		
 		JPanel loanPanel = new JPanel();
 		loanPanel.setBounds(50, YBegin, 400, loanPanelHeight);
@@ -213,6 +213,7 @@ public class UserInterface extends JFrame{
 		
 		contentPanel.add(namePanel);
 		contentPanel.add(accountPanel);
+		contentPanel.add(securityAccountPanel);
 		contentPanel.add(loanPanel);
 		contentPanel.add(titlePanel);
 		contentPanel.add(background);
@@ -302,6 +303,27 @@ public class UserInterface extends JFrame{
 				}
 			}
 		});
+
+		createSeacc.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				int res = userController.createAccount(username, Config.SECURITYACCOUNT, Config.DEFAULTCURRENCY, BankController.getBank().getOpenAccountFee());
+				if(res == ErrCode.OK) {
+					UserInterface.this.dispose();
+					new UserInterface(username);
+				}
+				else {
+					Object[] options = {"OK"};
+					JOptionPane.showOptionDialog(null,
+							ErrCode.errCodeToStr(res), "Error",
+							JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
+							options,
+							options[0]);
+				}
+			}
+		});
 		
 		deposit.addActionListener(new ActionListener() {
 			
@@ -341,6 +363,38 @@ public class UserInterface extends JFrame{
 				UserInterface.this.dispose();
 				new AccountDetail(username, "");
 				
+			}
+		});
+
+//		buy.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				UserInterface.this.dispose();
+//				new StockTransaction(username, Config.BUY);
+//			}
+//		});
+//
+//		sell.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				UserInterface.this.dispose();
+//				new StockTransaction(username, Config.SELL);
+//			}
+//		});
+
+		allStocks.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				UserInterface.this.dispose();
+				new StocksMarket(username);
+			}
+		});
+
+		showStockDetail.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				UserInterface.this.dispose();
+				new StockAccountDetail();
 			}
 		});
 		
