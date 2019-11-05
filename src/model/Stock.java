@@ -41,4 +41,11 @@ public class Stock {
     public int getSoldCount() {
         return soldCount;
     }
+
+    public boolean equals(Object o) {
+        if(o == null || !(o instanceof Stock))
+            return false;
+        Stock stock = (Stock)o;
+        return stock.company.equals(this.company);
+    }
 }
