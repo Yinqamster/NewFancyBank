@@ -10,16 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import model.Account;
-import model.Bank;
-import model.CheckingAccount;
-import model.CurrencyConfig;
-import model.Date;
-import model.Loan;
-import model.Name;
-import model.SavingAccount;
-import model.Transaction;
-import model.User;
+import model.*;
 import utils.Config;
 import utils.ErrCode;
 import utils.UtilFunction;
@@ -274,6 +265,7 @@ public class UserController implements SystemInterface{
 	
 	
 	//default deposit some money when open account
+	// for security account, number is 0
 	public int createAccount(String username, int accountType, String currency, BigDecimal number) {
 		Account account = new Account();
 		if(accountType == Config.CHECKINGACCOUNT) {
@@ -281,6 +273,39 @@ public class UserController implements SystemInterface{
 		}
 		else if(accountType == Config.SAVINGACCOUNT){
 			account = new SavingAccount();
+		}
+		// added for security account
+		else if (accountType == Config.SECURITYACCOUNT) {
+			User user = bank.getUserList().get(username);
+			BigDecimal total = new BigDecimal("0");
+			Map<String, Account> accounts = user.getAccounts();
+			for (Map.Entry<String, Account> entry: accounts.entrySet()) {
+				if (entry.getValue() instanceof SavingAccount) {
+					Map<String, BigDecimal> balance = entry.getValue().getBalance();
+					if (balance.containsKey("dollar")) {
+						total = total.add(balance.get("dollar"));
+					}
+				}
+			}
+			if (total.compareTo(bank.getSecurityAccountThreshold()) >= 0) {
+				account = new SecurityAccount();
+
+				String accountNumber = UtilFunction.generateAccountNumber();
+				bank.addAccount(accountNumber, username);
+				account.setAccountNumber(accountNumber);
+
+				BigDecimal serviceCharge = bank.getOpenAccountFee();
+				bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+
+				Transaction t = new Transaction(username, user.getID(), currency, new BigDecimal("0"), serviceCharge, new BigDecimal("0"), UtilFunction.now(), null, Config.OPENACCOUNT, "", accountNumber);
+				account.addTransactionDetails(t);
+				user.getAccounts().put(accountNumber, account);
+				bank.addUser(username, user);
+				return ErrCode.OK;
+			}
+			else {
+				return ErrCode.NOENOUGHMONEY;
+			}
 		}
 //		account.setAccountType(accountType);
 		String accountNumber = UtilFunction.generateAccountNumber();
