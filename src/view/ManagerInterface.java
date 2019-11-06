@@ -56,8 +56,8 @@ public class ManagerInterface extends JFrame{
 		titlePanel.setBounds(50, 80, 400, 50);
 		
 		JPanel operationPanel = new JPanel(new GridLayout(6, 1, 100, 15));
-		operationPanel.setSize(200, 240);
-		operationPanel.setLocation(150, 200);
+		operationPanel.setSize(200, 290);
+		operationPanel.setLocation(150, 180);
 		
 		JButton checkBalance = new JButton("Check Balance");
 		checkBalance.setFont(new Font("Helvetica", Font.PLAIN, 15));
@@ -80,7 +80,7 @@ public class ManagerInterface extends JFrame{
 		handInterest.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		operationPanel.add(handInterest);
 		JButton manageStock = new JButton("Manage Stock");
-		manageStock.setIcon(new ImageIcon(Config.ROOT + "interest.png"));
+		manageStock.setIcon(new ImageIcon(Config.ROOT + "stocks.png"));
 		manageStock.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		operationPanel.add(manageStock);
 		
@@ -195,7 +195,7 @@ public class ManagerInterface extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ManagerInterface.this.dispose();
-				new StocksMarket("", Config.MANAGER);
+				new StockMarket("", Config.MANAGER);
 			}
 		});
 	}

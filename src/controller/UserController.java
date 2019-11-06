@@ -91,7 +91,8 @@ public class UserController implements SystemInterface{
 		User user = bank.getUserList().get(username);
 		for(Account a: user.getAccounts().values()){
 			if((accountType == Config.SAVINGACCOUNT && a instanceof SavingAccount)
-					|| accountType == Config.CHECKINGACCOUNT && a instanceof CheckingAccount) {
+					|| accountType == Config.CHECKINGACCOUNT && a instanceof CheckingAccount
+					|| accountType == Config.SECURITYACCOUNT && a instanceof SecurityAccount) {
 				accountList.add(a.getAccountNumber());
 			}
 		}

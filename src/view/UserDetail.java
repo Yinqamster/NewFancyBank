@@ -199,8 +199,6 @@ public class UserDetail extends JFrame{
 		stockLabelPanel.add(stock);
 		JScrollPane stockScrollPanel = new JScrollPane();
 
-		//TODO add stock detail
-
 		int transactionLabelPanelHeight = 0;
 
 		if(selectedAccount instanceof CheckingAccount || selectedAccount instanceof SavingAccount) {
@@ -239,20 +237,26 @@ public class UserDetail extends JFrame{
 
 			if (stockList != null && stockList.size() != 0) {
 				JPanel stockPanel = new JPanel();
-				stockPanel.setLayout(new GridLayout(stockPanelRows, 2, 10, 5));
+				stockPanel.setLayout(new GridLayout(stockPanelRows, 4, 10, 5));
 
+				JLabel tranID = new JLabel("ID: ");
+				tranID.setFont(new Font("Helvetica", Font.PLAIN, 15));
 				JLabel company = new JLabel("Company: ");
 				company.setFont(new Font("Helvetica", Font.PLAIN, 15));
 				JLabel amount = new JLabel("Amount: ");
 				amount.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				JLabel buyInPrice = new JLabel("Buy Price: ");
+				buyInPrice.setFont(new Font("Helvetica", Font.PLAIN, 15));
+				stockPanel.add(tranID);
 				stockPanel.add(company);
 				stockPanel.add(amount);
-//			for(Map.Entry<String, BigDecimal> b : balanceList.entrySet()) {
-//				JLabel curr = new JLabel(b.getKey());
-//				JLabel num = new JLabel(String.valueOf(b.getValue()));
-//				balancePanel.add(curr);
-//				balancePanel.add(num);
-//			}
+				stockPanel.add(buyInPrice);
+				for(Map.Entry<String, HoldingStock> hs : stockList.entrySet()) {
+					stockPanel.add(new JLabel(hs.getKey()));
+					stockPanel.add(new JLabel(hs.getValue().getCompanyName()));
+					stockPanel.add(new JLabel(String.valueOf(hs.getValue().getNumber())));
+					stockPanel.add(new JLabel(String.valueOf(hs.getValue().getBuyInPirce())));
+				}
 				stockScrollPanel.setViewportView(stockPanel);
 			}
 			transactionLabelPanelHeight = stockScrollPanel.getY() + stockScrollPanel.getHeight() + 20;
@@ -423,8 +427,6 @@ public class UserDetail extends JFrame{
 		contentPanel.add(transactionScrollPanel);
 		contentPanel.add(loanLabelPanel);
 		contentPanel.add(loanScrollPanel);
-		contentPanel.add(stockLabelPanel);
-		contentPanel.add(stockScrollPanel);
 		contentPanel.add(background);
 		
 		getContentPane().add(contentPanel);

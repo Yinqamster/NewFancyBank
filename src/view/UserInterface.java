@@ -388,7 +388,7 @@ public class UserInterface extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				UserInterface.this.dispose();
-				new StocksMarket(username, Config.USER);
+				new StockMarket(username, Config.USER);
 			}
 		});
 
@@ -396,7 +396,7 @@ public class UserInterface extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				UserInterface.this.dispose();
-				new StockAccountDetail();
+				new SecurityAccountDetail(username, "");
 			}
 		});
 		

@@ -1,8 +1,8 @@
 package view;
 
-import controller.BankController;
 import controller.UserController;
-import model.Stock;
+import model.HoldingStock;
+import model.SecurityAccount;
 import utils.Config;
 import utils.ErrCode;
 
@@ -11,13 +11,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import java.util.List;
 
-public class StocksMarket extends JFrame {
+public class SecurityAccountDetail extends JFrame {
 
     public UserController userController = UserController.getInstance();
-    public BankController managerController = BankController.getInstance();
 
-    public StocksMarket(String username, String identity) {
+    public SecurityAccountDetail(String username, String accNum) {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
 
@@ -27,7 +27,7 @@ public class StocksMarket extends JFrame {
         background.setBounds(0, 0, 500, 150);
 
         JPanel titlePanel = new JPanel();
-        JLabel title = new JLabel("Stock Market");
+        JLabel title = new JLabel("Security Account Detail");
         title.setFont(new Font("Helvetica", Font.PLAIN,35));
         titlePanel.add(title);
         titlePanel.setOpaque(false);
@@ -43,53 +43,74 @@ public class StocksMarket extends JFrame {
         logout.setBounds(452, 6, 35, 35);
         contentPanel.add(logout);
 
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new GridLayout(2, 2));
+        infoPanel.setBounds(40, 180, 400, 50);
+
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setFont(new Font("Helvetica", Font.PLAIN,15));
+        JLabel uname = new JLabel(username);
+        uname.setFont(new Font("Helvetica", Font.PLAIN,15));
+        infoPanel.add(usernameLabel);
+        infoPanel.add(uname);
+
+        JLabel accountLabel = new JLabel("Account:");
+        accountLabel.setFont(new Font("Helvetica", Font.PLAIN,15));
+        JComboBox<String> account = new JComboBox<String>();
+        List<String> securityAccount = userController.getAccountList(username, Config.SECURITYACCOUNT);
+        for(String s : securityAccount) {
+            account.addItem(s);
+        }
+        if(accNum != null && !accNum.isEmpty()) {
+            account.setSelectedItem(accNum);
+        }
+        account.setFont(new Font("Helvetica", Font.PLAIN,15));
+        infoPanel.add(accountLabel);
+        infoPanel.add(account);
 
 
-        Map<String, Stock> allStocks = BankController.getBank().getStockMap();
+        String accountNum = account.getSelectedItem().toString();
+        Map<String, HoldingStock> allStocks = ((SecurityAccount)userController.getAccountDetail(username, accountNum)).getStockList();
         int rows = allStocks == null || allStocks.size() == 0 ? 1 : allStocks.size() + 1;
-        int scrollPaneHeight = rows * 30 > 300 ? 300 : rows * 30;
+        int scrollPaneHeight = rows * 30 > 300 ? 300 : rows * 30 + 10;
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(40, 180, 400, scrollPaneHeight);
+        scrollPane.setBounds(40, infoPanel.getY() + infoPanel.getHeight() + 20, 400, scrollPaneHeight);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(rows, 3));
+        panel.setLayout(new GridLayout(rows, 5, 5,5));
 
+        JLabel IDLabel = new JLabel("ID");
+        IDLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
         JLabel companyLabel = new JLabel("Company");
         companyLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        JLabel unitPriceLabel = new JLabel("Unit Price");
-        unitPriceLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        JLabel currentPriceLabel = new JLabel("Current Price");
+        currentPriceLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        JLabel buyInPriceLabel = new JLabel("Buy Price");
+        buyInPriceLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
         JLabel operationLabel = new JLabel("Operation");
         operationLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
 
+        panel.add(IDLabel);
         panel.add(companyLabel);
-        panel.add(unitPriceLabel);
+        panel.add(currentPriceLabel);
+        panel.add(buyInPriceLabel);
         panel.add(operationLabel);
 
         if(allStocks != null && allStocks.size() != 0) {
-            for(Stock s : allStocks.values()) {
-                String companyName = s.getCompany();
-                panel.add(new JLabel(companyName));
-                panel.add(new JLabel(String.valueOf(s.getUnitPrice())));
-                JButton operationButton = new JButton();
-                if(identity.equals(Config.USER)) {
-                    operationButton.setText("Buy");
-                }
-                else if(identity.equals(Config.MANAGER)) {
-                    operationButton.setText("Edit");
-                }
+            for(Map.Entry<String, HoldingStock> s : allStocks.entrySet()) {
+                String tranID = s.getKey();
+                panel.add(new JLabel(tranID));
+                panel.add(new JLabel(s.getValue().getCompanyName()));
+
+
+                panel.add(new JLabel(String.valueOf(s.getValue().getBuyInPirce())));
+                JButton operationButton = new JButton("Sell");
                 panel.add(operationButton);
                 operationButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        StocksMarket.this.dispose();
-                        if(identity.equals(Config.USER)) {
-                            new StockTransaction(username, Config.BUY, companyName);
-                        }
-                        else if(identity.equals(Config.MANAGER)) {
-                            new StockManagement(companyName);
-                        }
-
-
+                        SecurityAccountDetail.this.dispose();
+                        new StockTransaction(username, Config.SELL, tranID, "");
                     }
                 });
             }
@@ -98,30 +119,21 @@ public class StocksMarket extends JFrame {
         scrollPane.setViewportView(panel);
 
 
-        JPanel addStockPanel = new JPanel(new GridLayout(1,4));
-        addStockPanel.setBounds(200, scrollPane.getY()+scrollPane.getHeight() + 20, 100, 25);
-        JButton addStock = new JButton("Add");
-        addStock.setFont(new Font("Helvetica", Font.PLAIN,15));
-        addStockPanel.add(addStock);
-
-
         contentPanel.add(titlePanel);
+        contentPanel.add(infoPanel);
         contentPanel.add(scrollPane);
-        if(identity.equals(Config.MANAGER)) {
-            contentPanel.add(addStockPanel);
-        }
         contentPanel.add(background);
 
         getContentPane().add(contentPanel);
 
         Dimension screenSize =Toolkit.getDefaultToolkit().getScreenSize();
         int totalWidth = 500;
-        int totalHeight = scrollPane.getY() + scrollPane.getHeight() + 60;
+        int totalHeight = scrollPane.getY() + scrollPane.getHeight() + 50;
         totalHeight = totalHeight > 500 ? totalHeight : 500;
         int locationX = (int)screenSize.getWidth()/2 - totalWidth/2;
         int locationY = (int)screenSize.getHeight()/2 - totalHeight/2;
 
-        this.setTitle( "Bank ATM Stock Market" );
+        this.setTitle( "Bank ATM Account Detail" );
         this.setResizable(false);
         this.setSize(totalWidth, totalHeight);
         this.setLocation(locationX, locationY);
@@ -129,12 +141,11 @@ public class StocksMarket extends JFrame {
         this.setVisible( true );
 
 
-
-        addStock.addActionListener(new ActionListener() {
+        account.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StocksMarket.this.dispose();
-                new StockManagement("");
+                SecurityAccountDetail.this.dispose();
+                new SecurityAccountDetail(username, account.getSelectedItem().toString());
             }
         });
 
@@ -143,13 +154,8 @@ public class StocksMarket extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
-                StocksMarket.this.dispose();
-                if(identity.equals(Config.USER)) {
-                    new UserInterface(username);
-                }
-                else if(identity.equals(Config.MANAGER)) {
-                    new ManagerInterface(Config.MANAGERUSERNAME);
-                }
+                SecurityAccountDetail.this.dispose();
+                new UserInterface(username);
             }
         });
 
@@ -158,16 +164,10 @@ public class StocksMarket extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
-                int res = -1;
-                if(identity.equals(Config.USER)) {
-                    res = userController.logout(username);
-                }
-                else if(identity.equals(Config.MANAGER)) {
-                    res = managerController.logout(Config.MANAGERUSERNAME);
-                }
+                int res = userController.logout(username);
                 if(res == ErrCode.OK) {
-                    StocksMarket.this.dispose();
-                    new Login(identity);
+                    SecurityAccountDetail.this.dispose();
+                    new Login(Config.USER);
                 }
                 else {
                     System.out.println("Logout Error");

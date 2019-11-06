@@ -127,7 +127,7 @@ public class StockManagement extends JFrame {
                             options[0]);
 
                     StockManagement.this.dispose();
-                    new StocksMarket("", Config.MANAGER);
+                    new StockMarket("", Config.MANAGER);
                 }
                 else {
                     Object[] options = {"OK"};
@@ -144,7 +144,7 @@ public class StockManagement extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StockManagement.this.dispose();
-                new StocksMarket("", Config.MANAGER);
+                new StockMarket("", Config.MANAGER);
             }
         });
 
@@ -154,7 +154,7 @@ public class StockManagement extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
                 StockManagement.this.dispose();
-                new StocksMarket("", Config.MANAGER);
+                new StockMarket("", Config.MANAGER);
             }
         });
 

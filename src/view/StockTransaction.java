@@ -5,19 +5,20 @@ import controller.UserController;
 import model.HoldingStock;
 import model.Stock;
 import utils.Config;
-import utils.ErrCode;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class StockTransaction extends JFrame {
 
     UserController userController = UserController.getInstance();
 
-    public StockTransaction(String username, int type, String str) {
+    //str: company name is type is buy, transaction id if type is sell
+    public StockTransaction(String username, int type, String str, String accNum) {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
 
@@ -65,7 +66,8 @@ public class StockTransaction extends JFrame {
             cPrice = String.valueOf(stock.getUnitPrice());
         }
         else {
-            holdingStock = userController.getHoldingStock(username, transactionID);
+//            holdingStock = userController.getHoldingStock(username, transactionID);
+            holdingStock = new HoldingStock("", BigDecimal.ZERO, BigDecimal.ZERO);
             stock = BankController.getBank().getStockMap().get(holdingStock.getCompanyName());
             cName = holdingStock.getCompanyName();
             cPrice = String.valueOf(stock.getUnitPrice());
@@ -96,6 +98,9 @@ public class StockTransaction extends JFrame {
         JComboBox<String> accountList = new JComboBox<String>();
         for(String c : savingAccounts) {
             accountList.addItem(c);
+        }
+        if(accNum != null && !accNum.isEmpty()) {
+            accountList.setSelectedItem(accNum);
         }
         panel.add(savingAccountLabel);
         panel.add(accountList);
@@ -184,7 +189,15 @@ public class StockTransaction extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StockTransaction.this.dispose();
-                new StocksMarket(username, Config.USER);
+                new StockMarket(username, Config.USER);
+            }
+        });
+
+        accountList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StockTransaction.this.dispose();
+                new StockTransaction(username, type, str, accountList.getSelectedItem().toString());
             }
         });
     }
