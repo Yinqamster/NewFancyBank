@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+*.json
 
 # BlueJ files
 *.ctxt
@@ -11,7 +12,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar #
 *.war
 *.nar
 *.ear
