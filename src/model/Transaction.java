@@ -21,8 +21,10 @@ public class Transaction {
 	private String username;
 	private String transactionID;
 	private String remarks;
+	// for security account, num is the number of stocks purchase/sold
 	private BigDecimal num;
 	private BigDecimal serviceCharge;
+	// for security account, balance is transaction amount (num * unit price)
 	private BigDecimal balance;
 	
 	public Transaction() {

@@ -30,30 +30,4 @@ public class SecurityAccount extends Account{
     public void setTotalAccount(BigDecimal totalAccount) {
         this.totalAccount = totalAccount;
     }
-
-    //The method below should be written in controller
-    /**
-     *
-     * @param purchaseID It will be generated before creating a stock object
-     * @param stock The stock user wants to buy
-     */
-    public void addStock(String purchaseID, Stock stock, int number) {
-        HoldingStock holdingStock = new HoldingStock(stock.getCompany(), stock.getUnitPrice(), new BigDecimal(number));
-        stockList.put(purchaseID, holdingStock);
-        // It will subtract the price of stock
-        totalAccount.add(stock.getUnitPrice().multiply(new BigDecimal(number)));
-    }
-
-    /**
-     *
-     * @param purchaseID The identity of a stock
-     * @return
-     */
-    public boolean removeStock(String purchaseID) {
-        if(stockList.containsKey(purchaseID)) {
-            stockList.remove(purchaseID);
-            return true;
-        }
-        return false;
-    }
 }

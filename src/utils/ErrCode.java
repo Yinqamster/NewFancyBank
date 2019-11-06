@@ -55,6 +55,9 @@ public class ErrCode {
 	public static final int STOCKEXIST = 501;
 	public static final int STOCKNOTEXIST = 502;
 	public static final int ILLEGALINPUT = 503;
+
+	// Database
+	public static final int DATABASECONNECTIONFAIL = 601;
 	
 	
 	public static String errCodeToStr(int errCode) {
@@ -173,6 +176,9 @@ public class ErrCode {
 			break;
 		case ILLEGALINPUT:
 			errString = "Illegal Input";
+			break;
+		case DATABASECONNECTIONFAIL:
+			errString = "Fail to Connect Database";
 			break;
 		default:
 			errString = "Error. Please try later.";
