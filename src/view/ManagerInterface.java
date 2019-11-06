@@ -55,7 +55,7 @@ public class ManagerInterface extends JFrame{
 		titlePanel.setOpaque(false);
 		titlePanel.setBounds(50, 80, 400, 50);
 		
-		JPanel operationPanel = new JPanel(new GridLayout(5, 1, 100, 15));
+		JPanel operationPanel = new JPanel(new GridLayout(6, 1, 100, 15));
 		operationPanel.setSize(200, 240);
 		operationPanel.setLocation(150, 200);
 		
@@ -79,6 +79,10 @@ public class ManagerInterface extends JFrame{
 		handInterest.setIcon(new ImageIcon(Config.ROOT + "interest.png"));
 		handInterest.setFont(new Font("Helvetica", Font.PLAIN, 15));
 		operationPanel.add(handInterest);
+		JButton manageStock = new JButton("Manage Stock");
+		manageStock.setIcon(new ImageIcon(Config.ROOT + "interest.png"));
+		manageStock.setFont(new Font("Helvetica", Font.PLAIN, 15));
+		operationPanel.add(manageStock);
 		
 		panel.add(titlePanel);
 		panel.add(operationPanel);
@@ -184,6 +188,14 @@ public class ManagerInterface extends JFrame{
 			                options[0]); 
 				}
 				
+			}
+		});
+
+		manageStock.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ManagerInterface.this.dispose();
+				new StocksMarket("", Config.MANAGER);
 			}
 		});
 	}

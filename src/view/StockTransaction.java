@@ -2,11 +2,15 @@ package view;
 
 import controller.BankController;
 import controller.UserController;
+import model.HoldingStock;
 import model.Stock;
 import utils.Config;
+import utils.ErrCode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class StockTransaction extends JFrame {
@@ -17,7 +21,7 @@ public class StockTransaction extends JFrame {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
 
-        int rows = type == Config.BUY ? 5 : 6;
+        int rows = type == Config.BUY ? 6 : 9;
         String companyName = "";
         String transactionID = "";
         if(type == Config.BUY) {
@@ -36,7 +40,7 @@ public class StockTransaction extends JFrame {
         background.setBounds(0, 0, 500, 150);
 
         JPanel titlePanel = new JPanel();
-        JLabel title = new JLabel();
+        JLabel title = new JLabel("Stock Transaction");
         title.setFont(new Font("Helvetica",Font.PLAIN,35));
         titlePanel.add(title);
         titlePanel.setOpaque(false);
@@ -46,16 +50,27 @@ public class StockTransaction extends JFrame {
         usernameLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
         JLabel uname = new JLabel(username);
         uname.setFont(new Font("Helvetica",Font.PLAIN,15));
-        panel.add(usernameLabel);
-        panel.add(uname);
 
         //TODO get stock by stock id
         Stock stock;
+        HoldingStock holdingStock;
+        String cName;
+        String cPrice;
+        String s = "0";
+        String biP = "0";
+
         if(type == Config.BUY) {
-            stock = BankController.getBank().getStockList().get(companyName);
+            stock = BankController.getBank().getStockMap().get(companyName);
+            cName = stock.getCompany();
+            cPrice = String.valueOf(stock.getUnitPrice());
         }
         else {
-            stock = userController.getStock(username, transactionID);
+            holdingStock = userController.getHoldingStock(username, transactionID);
+            stock = BankController.getBank().getStockMap().get(holdingStock.getCompanyName());
+            cName = holdingStock.getCompanyName();
+            cPrice = String.valueOf(stock.getUnitPrice());
+            s = String.valueOf(holdingStock.getNumber());
+            biP = String.valueOf(holdingStock.getBuyInPirce());
         }
 
         JLabel tranIDLabel = new JLabel("Transaction ID: ");
@@ -70,7 +85,7 @@ public class StockTransaction extends JFrame {
 
         JLabel companyLabel = new JLabel("Company: ");
         companyLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
-        JLabel company = new JLabel(stock.getCompany());
+        JLabel company = new JLabel(cName);
         company.setFont(new Font("Helvetica",Font.PLAIN,15));
         panel.add(companyLabel);
         panel.add(company);
@@ -85,24 +100,60 @@ public class StockTransaction extends JFrame {
         panel.add(savingAccountLabel);
         panel.add(accountList);
 
+        JLabel priceLabel = new JLabel("Current Price");
+        priceLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
+        JLabel price = new JLabel(cPrice);
+        price.setFont(new Font("Helvetica",Font.PLAIN,15));
+
         JLabel sizeLabel = new JLabel("Quantity");
         sizeLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
         JTextField size = new JTextField();
         if(type == Config.SELL) {
-            //TODO add stock size
-//            size.setText();
+            size.setText(s);
         }
 
+        JLabel sellSizeLabel = new JLabel("Sell");
+        sellSizeLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
+        JTextField sellSize = new JTextField();
 
+        JLabel buyInPriceLabel = new JLabel("Buy In Price");
+        buyInPriceLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
+        JLabel buyInPrice = new JLabel(biP);
+        buyInPrice.setFont(new Font("Helvetica",Font.PLAIN,15));
 
+        JButton ok = new JButton("OK");
+        ok.setFont(new Font("Helvetica",Font.PLAIN,15));
+        JButton cancel = new JButton("Cancel");
+        cancel.setFont(new Font("Helvetica",Font.PLAIN,15));
 
-
-
-
+        panel.add(usernameLabel);
+        panel.add(uname);
+        if(type == Config.SELL) {
+            panel.add(tranIDLabel);
+            panel.add(tranID);
+        }
+        panel.add(companyLabel);
+        panel.add(company);
+        panel.add(priceLabel);
+        panel.add(price);
+        if(type == Config.SELL) {
+            panel.add(buyInPriceLabel);
+            panel.add(buyInPrice);
+        }
+        panel.add(savingAccountLabel);
+        panel.add(accountList);
+        panel.add(sizeLabel);
+        panel.add(size);
+        if(type == Config.SELL) {
+            panel.add(sellSizeLabel);
+            panel.add(sellSize);
+        }
+        panel.add(ok);
+        panel.add(cancel);
 
 
         contentPanel.add(titlePanel);
-//        contentPanel.add(scrollPane);
+        contentPanel.add(panel);
         contentPanel.add(background);
 
         getContentPane().add(contentPanel);
@@ -114,11 +165,27 @@ public class StockTransaction extends JFrame {
         int locationX = (int)screenSize.getWidth()/2 - totalWidth/2;
         int locationY = (int)screenSize.getHeight()/2 - totalHeight/2;
 
-        this.setTitle( "Bank ATM Stock Market" );
+        this.setTitle( "Bank ATM Stock Transaction" );
         this.setResizable(false);
         this.setSize(totalWidth, totalHeight);
         this.setLocation(locationX, locationY);
         this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
         this.setVisible( true );
+
+        ok.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO invoke user controller
+            }
+        });
+
+
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StockTransaction.this.dispose();
+                new StocksMarket(username, Config.USER);
+            }
+        });
     }
 }

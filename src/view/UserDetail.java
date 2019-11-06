@@ -199,6 +199,8 @@ public class UserDetail extends JFrame{
 		stockLabelPanel.add(stock);
 		JScrollPane stockScrollPanel = new JScrollPane();
 
+		//TODO add stock detail
+
 		int transactionLabelPanelHeight = 0;
 
 		if(selectedAccount instanceof CheckingAccount || selectedAccount instanceof SavingAccount) {
@@ -229,7 +231,7 @@ public class UserDetail extends JFrame{
 			transactionLabelPanelHeight = balanceScrollPanel.getY() + balanceScrollPanel.getHeight() + 20;
 		}
 		else if(selectedAccount instanceof SecurityAccount) {
-			Map<String, Map<Stock, Integer>> stockList = ((SecurityAccount) selectedAccount).getStockList();
+			Map<String, HoldingStock> stockList = ((SecurityAccount) selectedAccount).getStockList();
 			int stockPanelRows = stockList == null || stockList.size() == 0 ? 0 : stockList.size() + 1;
 
 			int stockScrollPaneHeight = 25 * stockPanelRows > 100 ? 100 : 25 * stockPanelRows;

@@ -138,8 +138,6 @@ public class Bank{
 		this.transactionIdList.add(transactionId);
 	}
 
-	public Set<Stock> getStockList() {return this.stockList; }
-
 	public boolean addStock(Stock stock) {
 		if(stockMap.containsKey(stock.getCompany()))
 			return false;

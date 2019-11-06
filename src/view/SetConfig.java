@@ -53,8 +53,8 @@ public class SetConfig extends JFrame{
 		titlePanel.setBounds(50, 80, 400, 50);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(40, 180, 400, 105);
-		panel.setLayout(new GridLayout(3, 2, 10, 15));
+		panel.setBounds(40, 180, 400, 175);
+		panel.setLayout(new GridLayout(5, 2, 10, 15));
 		
 		JLabel openAccountFee = new JLabel("Open Account Fee*:");
 //		openAccountFee.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -74,20 +74,18 @@ public class SetConfig extends JFrame{
 //		caf.setHorizontalAlignment(SwingConstants.LEFT);
 		panel.add(caf);
 
-		//TODO add
 		JLabel purchaseStockFee = new JLabel("Purchase Stock Fee*：");
 		purchaseStockFee.setFont(new Font("Helvetica",Font.PLAIN,15));
 		panel.add(purchaseStockFee);
 		JTextField psf = new JTextField(10);
-		psf.setText(String.valueOf(bank.getCloseAccountFee()));
+		psf.setText(String.valueOf(bank.getStockTransactionFee()));
 		panel.add(psf);
 
-
 		JLabel securityThreshold = new JLabel("Security Threshold*：");
-		closeAccountFee.setFont(new Font("Helvetica",Font.PLAIN,15));
+		securityThreshold.setFont(new Font("Helvetica",Font.PLAIN,15));
 		panel.add(securityThreshold);
 		JTextField st = new JTextField(10);
-		st.setText(String.valueOf(bank.getCloseAccountFee()));
+		st.setText(String.valueOf(bank.getSecurityAccountThreshold()));
 		panel.add(st);
 
 
@@ -210,7 +208,7 @@ public class SetConfig extends JFrame{
 		
 		Dimension screenSize =Toolkit.getDefaultToolkit().getScreenSize();
 		int totalWidth = 500;
-		int totalHeight = panel.getY() + panel.getHeight() + 50;
+		int totalHeight = buttonPanel.getY() + buttonPanel.getHeight() + 50;
 		totalHeight = totalHeight > 500 ? totalHeight : 500;
 		int locationX = (int)screenSize.getWidth()/2 - totalWidth/2;
 		int locationY = (int)screenSize.getHeight()/2 - totalHeight/2;

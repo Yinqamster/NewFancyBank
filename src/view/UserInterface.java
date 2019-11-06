@@ -126,9 +126,10 @@ public class UserInterface extends JFrame{
 		}
 
 
-		//TODO : add security account
 		List<String> securityAccount = userController.getAccountList(username, Config.SECURITYACCOUNT);
 		boolean hasSecurityAccount = securityAccount == null || securityAccount.size()==0 ? false : true;
+		//only for test
+//		hasSecurityAccount = true;
 		int securityRows = securityAccount.size();
 		securityRows += hasSecurityAccount ? 2 : 1;
 		int securityPanelHeight = 25 * securityRows;
@@ -155,6 +156,7 @@ public class UserInterface extends JFrame{
 //		JButton sell = new JButton("Sell");
 		JButton allStocks = new JButton("Stocks Market");
 		JButton showStockDetail = new JButton("Show Details");
+
 		if(hasSecurityAccount) {
 //			securityAccountPanel.add(buy);
 //			securityAccountPanel.add(sell);
@@ -386,7 +388,7 @@ public class UserInterface extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				UserInterface.this.dispose();
-				new StocksMarket(username);
+				new StocksMarket(username, Config.USER);
 			}
 		});
 
