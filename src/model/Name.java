@@ -21,6 +21,12 @@ public class Name {
 		lastName = lname;
 		nickName = nname;
 	}
+
+	public Name(String fname, String lname, String nname) {
+		firstName = fname;
+		lastName = lname;
+		nickName = nname;
+	}
 	
 	public void setFirstName(String fname) {
 		firstName = fname;
@@ -57,7 +63,7 @@ public class Name {
 	//get the fully true name
 	public String getFullName() {
 		String fullname = firstName + " ";
-		if(!middleName.isEmpty() && middleName != null) {
+		if(middleName != null && !middleName.isEmpty()) {
 			fullname += middleName + " ";
 		}
 		fullname += lastName;

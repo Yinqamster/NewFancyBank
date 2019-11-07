@@ -58,6 +58,7 @@ public class ErrCode {
 
 	// Database
 	public static final int DATABASECONNECTIONFAIL = 601;
+    public static final int INITDATAFAIL = 602;
 	
 	
 	public static String errCodeToStr(int errCode) {
@@ -180,6 +181,9 @@ public class ErrCode {
 		case DATABASECONNECTIONFAIL:
 			errString = "Fail to Connect Database";
 			break;
+		case INITDATAFAIL:
+		    errString = "Fail to Init Data from Database";
+		    break;
 		default:
 			errString = "Error. Please try later.";
 			break;
