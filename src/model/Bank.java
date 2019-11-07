@@ -7,6 +7,7 @@ package model;
 
 import java.math.BigDecimal;
 import java.util.*;
+import db.operation.Operations;
 
 import utils.Config;
 
@@ -35,7 +36,10 @@ public class Bank{
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
-		userList = new HashMap<String, User>();
+//		userList = new HashMap<String, User>();
+		userList = Operations.getUserListFromDB(); // get userList from database
+		System.out.println(userList.size());
+
 		currencyList = new HashMap<String, Currency>();
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
