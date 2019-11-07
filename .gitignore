@@ -28,6 +28,7 @@ hs_err_pid*
 *.iml
 *.ipr
 *.iws
+out
 
 # Eclipse Project files
 .classpath
