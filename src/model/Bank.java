@@ -38,8 +38,6 @@ public class Bank{
 		balance = new HashMap<String, BigDecimal>();
 //		userList = new HashMap<String, User>();
 		userList = Operations.getUserListFromDB(); // get userList from database
-		System.out.println(userList.size());
-
 		currencyList = new HashMap<String, Currency>();
 		accountList = new HashMap<String, String>();
 		transactionIdList = new ArrayList<String>();
