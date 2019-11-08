@@ -36,11 +36,10 @@ public class Bank{
 	
 	public Bank(){
 		balance = new HashMap<String, BigDecimal>();
-//		userList = new HashMap<String, User>();
-		userList = Operations.getUserListFromDB(); // get userList from database
-		currencyList = new HashMap<String, Currency>();
-		accountList = new HashMap<String, String>();
-		transactionIdList = new ArrayList<String>();
+		userList = Operations.getUserListFromDB(); // get userList from database, including accouts and loans for every user
+		currencyList = Operations.getCurrencyListFromDB(); // get currencyList from database
+		accountList = Operations.getAccountMapFromDB();
+        transactionIdList = Operations.getTransactionIdList();
 		// added for security account and stock
 		stockMap = new HashMap<>();
 		
@@ -51,12 +50,12 @@ public class Bank{
 		stockTransactionFee = Config.DEFAULTSTOCKCHARGERATE;
 		securityAccountThreshold = Config.DEFAULTSECURITYTHRESHOLD;
 		
-		CurrencyConfig currencyConfig  = new CurrencyConfig(
-				Config.DEFAULTSERVICECHARGERATE,
-				Config.DEFAULTINTERESTFORLOAN,
-				Config.DEFAULTINTERESTSFORSAVINGACCOUNT,
-				Config.DEFAULTBALANCEFORINTEREST);
-		currencyList.put(Config.DEFAULTCURRENCY, new Currency(Config.DEFAULTCURRENCY, currencyConfig));
+//		CurrencyConfig currencyConfig  = new CurrencyConfig(
+//				Config.DEFAULTSERVICECHARGERATE,
+//				Config.DEFAULTINTERESTFORLOAN,
+//				Config.DEFAULTINTERESTSFORSAVINGACCOUNT,
+//				Config.DEFAULTBALANCEFORINTEREST);
+//		currencyList.put(Config.DEFAULTCURRENCY, new Currency(Config.DEFAULTCURRENCY, currencyConfig));
 	}
 	
 	public String getUsername() {

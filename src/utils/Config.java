@@ -41,7 +41,7 @@ public class Config {
 	
 	
 	//default config
-	public static final String DEFAULTCURRENCY = "dollar";
+	public static final String DEFAULTCURRENCY = "USD";
 	public static final BigDecimal DEFAULTSERVICECHARGERATE = new BigDecimal("0.01");
 	public static final BigDecimal DEFAULTINTERESTSFORSAVINGACCOUNT = new BigDecimal("0.03");
 	public static final BigDecimal DEFAULTINTERESTFORLOAN = new BigDecimal("0.1");

@@ -15,6 +15,12 @@ public class SecurityAccount extends Account{
         totalAccount = new BigDecimal("0");
     }
 
+    public SecurityAccount(String accountNumber, Map<String, HoldingStock> stockList, BigDecimal totalAccount){
+        super(accountNumber);
+        this.stockList = stockList;
+        this.totalAccount = totalAccount;
+    }
+
     public Map<String, HoldingStock> getStockList() {
         return stockList;
     }

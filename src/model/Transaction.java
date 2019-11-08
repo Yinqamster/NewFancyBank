@@ -52,6 +52,22 @@ public class Transaction {
 		this.fromAccountNumber = from;
 		this.toAccountNumber = to;
 	}
+
+	public Transaction(String transactionID, String username, int userID, String currency, BigDecimal num, BigDecimal serviceCharge, BigDecimal balance,
+					   Date date, String remarks, int transactionType, String from, String to) {
+		this.username = username;
+		this.userID = userID;
+		this.currency = currency;
+		this.num = num;
+		this.serviceCharge = serviceCharge;
+		this.balance = balance;
+		this.date = date;
+		this.remarks = remarks;
+		this.transactionType = transactionType;
+		this.transactionID = transactionID;
+		this.fromAccountNumber = from;
+		this.toAccountNumber = to;
+	}
 	
 	public String getUsername() {
 		return this.username;

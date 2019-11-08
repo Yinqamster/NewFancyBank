@@ -133,9 +133,19 @@ public class UtilFunction {
 	//split date input
 	public static Date stringToDate(String str) {
 		String[] date = str.split("/");
-		Date d = new Date((int)Integer.valueOf(date[0]), (int)Integer.valueOf(date[1]), (int)Integer.valueOf(date[2]));
+		Date d = new Date(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
 		return d;
 	}
+
+	// split time input
+    public static Date stringToTime(String str){
+	    String[] datetime = str.split(" ");
+	    String[] date = datetime[0].split("/");
+	    String[] time = datetime[1].split(":");
+	    Date d = new Date(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]),
+                Integer.parseInt(time[0]), Integer.parseInt(time[1]), Integer.parseInt(time[2]));
+	    return d;
+    }
 	
 	//password check
 	public static int checkPassword(String password){
