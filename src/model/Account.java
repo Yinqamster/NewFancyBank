@@ -23,6 +23,16 @@ public class Account {
 		//transaction id, transaction
 		transactionDetails = new HashMap<String, Transaction>();
 	}
+
+	public Account(String accountNumber, Map<String, BigDecimal> balance, Map<String, Transaction> transactionDetails){
+		this.accountNumber = accountNumber;
+		this.balance = balance;
+		this.transactionDetails = transactionDetails;
+	}
+
+	public Account(String accountNumber){
+		this.accountNumber = accountNumber;
+	}
 	
 //	public int getAccountType(){
 //		return this.accountType;
@@ -47,7 +57,9 @@ public class Account {
 	public void setBalance(Map<String, BigDecimal> balance){
 		this.balance = balance;
 	}
-	
+
+	public void setTransactionDetails(Map<String, Transaction> transactionDetails){this.transactionDetails = transactionDetails;}
+
 	public Map<String, Transaction> getTransactionDetails() {
 		return this.transactionDetails;
 	}

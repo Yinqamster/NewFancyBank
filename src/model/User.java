@@ -20,9 +20,7 @@ public class User extends Person{
 	//loan name, loan
 	private Map<String, Loan> loanList;
 	
-	public User(){
-		
-	}
+	public User(){}
 	
 	public User(Name name, int sex, long phoneNum, String email, Date birthday, String password) {
 		super(name, phoneNum, email, birthday, sex);
@@ -58,7 +56,9 @@ public class User extends Person{
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	
+
+	public void setAccounts(Map<String, Account> accounts){this.accounts = accounts;};
+
 	public Map<String, Account> getAccounts() {
 		return this.accounts;
 	}
@@ -70,7 +70,9 @@ public class User extends Person{
 	public Map<String, Loan> getLoanList() {
 		return this.loanList;
 	}
-	
+
+	public void setLoanList(Map<String, Loan> loanMap){this.loanList = loanMap;};
+
 	public void addLoan(Loan loan) {
 		this.loanList.put(loan.getName(), loan);
 	}

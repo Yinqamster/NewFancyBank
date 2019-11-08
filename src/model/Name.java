@@ -24,6 +24,7 @@ public class Name {
 
 	public Name(String fname, String lname, String nname) {
 		firstName = fname;
+		middleName = "";
 		lastName = lname;
 		nickName = nname;
 	}
