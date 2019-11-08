@@ -18,11 +18,11 @@ public class StockTransaction extends JFrame {
     UserController userController = UserController.getInstance();
 
     //str: company name is type is buy, transaction id if type is sell
-    public StockTransaction(String username, int type, String str, String accNum) {
+    public StockTransaction(String username, int type, String str, String saAccNum, String seAccNum) {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
 
-        int rows = type == Config.BUY ? 6 : 9;
+        int rows = type == Config.BUY ? 7 : 9;
         String companyName = "";
         String transactionID = "";
         if(type == Config.BUY) {
@@ -99,11 +99,24 @@ public class StockTransaction extends JFrame {
         for(String c : savingAccounts) {
             accountList.addItem(c);
         }
-        if(accNum != null && !accNum.isEmpty()) {
-            accountList.setSelectedItem(accNum);
+        if(saAccNum != null && !saAccNum.isEmpty()) {
+            accountList.setSelectedItem(saAccNum);
         }
         panel.add(savingAccountLabel);
         panel.add(accountList);
+
+        List<String> securityAccounts = userController.getAccountList(username, Config.SECURITYACCOUNT);
+        JLabel securityAccountLabel = new JLabel("Security Account");
+        securityAccountLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
+        JComboBox<String> sAccountList = new JComboBox<String>();
+        for(String c : securityAccounts) {
+            sAccountList.addItem(c);
+        }
+        if(seAccNum != null && !seAccNum.isEmpty()) {
+            sAccountList.setSelectedItem(seAccNum);
+        }
+        panel.add(securityAccountLabel);
+        panel.add(sAccountList);
 
         JLabel priceLabel = new JLabel("Current Price");
         priceLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
@@ -147,6 +160,10 @@ public class StockTransaction extends JFrame {
         }
         panel.add(savingAccountLabel);
         panel.add(accountList);
+        if(type == Config.BUY) {
+            panel.add(securityAccountLabel);
+            panel.add(sAccountList);
+        }
         panel.add(sizeLabel);
         panel.add(size);
         if(type == Config.SELL) {
@@ -197,8 +214,17 @@ public class StockTransaction extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StockTransaction.this.dispose();
-                new StockTransaction(username, type, str, accountList.getSelectedItem().toString());
+                new StockTransaction(username, type, str, accountList.getSelectedItem().toString(), sAccountList.getSelectedItem().toString());
             }
         });
+
+        sAccountList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StockTransaction.this.dispose();
+                new StockTransaction(username, type, str, accountList.getSelectedItem().toString(), sAccountList.getSelectedItem().toString());
+            }
+        });
+
     }
 }

@@ -83,7 +83,7 @@ public class StockMarket extends JFrame {
                     public void actionPerformed(ActionEvent e) {
                         StockMarket.this.dispose();
                         if(identity.equals(Config.USER)) {
-                            new StockTransaction(username, Config.BUY, companyName, "");
+                            new StockTransaction(username, Config.BUY, companyName, "", "");
                         }
                         else if(identity.equals(Config.MANAGER)) {
                             new StockManagement(companyName);

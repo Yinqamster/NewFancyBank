@@ -110,7 +110,7 @@ public class SecurityAccountDetail extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         SecurityAccountDetail.this.dispose();
-                        new StockTransaction(username, Config.SELL, tranID, "");
+                        new StockTransaction(username, Config.SELL, tranID, "", "");
                     }
                 });
             }
