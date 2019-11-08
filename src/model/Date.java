@@ -13,9 +13,7 @@ public class Date implements Comparable<Date>{
 	private int minute;
 	private int second;
 	
-	public Date(){
-		
-	}
+	public Date(){}
 	
 	public Date(int month, int day, int year) {
 		this.year = year;
