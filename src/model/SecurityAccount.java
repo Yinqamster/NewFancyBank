@@ -7,18 +7,16 @@ import java.util.Map;
 public class SecurityAccount extends Account{
     //String: transaction; Stock stock
     private Map<String, HoldingStock> stockList;
-    private BigDecimal totalAccount;
+    // private BigDecimal totalAccount;
 
     public SecurityAccount() {
         super();
         stockList = new HashMap<>();
-        totalAccount = new BigDecimal("0");
     }
 
-    public SecurityAccount(String accountNumber, Map<String, HoldingStock> stockList, BigDecimal totalAccount){
+    public SecurityAccount(String accountNumber, Map<String, HoldingStock> stockList){
         super(accountNumber);
         this.stockList = stockList;
-        this.totalAccount = totalAccount;
     }
 
     public Map<String, HoldingStock> getStockList() {
@@ -29,11 +27,4 @@ public class SecurityAccount extends Account{
         this.stockList = stockList;
     }
 
-    public BigDecimal getTotalAccount() {
-        return totalAccount;
-    }
-
-    public void setTotalAccount(BigDecimal totalAccount) {
-        this.totalAccount = totalAccount;
-    }
 }

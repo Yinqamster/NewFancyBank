@@ -14,6 +14,7 @@ import model.*;
 import utils.Config;
 import utils.ErrCode;
 import utils.UtilFunction;
+import view.Transact;
 
 public class UserController implements SystemInterface{
 	
@@ -283,8 +284,8 @@ public class UserController implements SystemInterface{
 			for (Map.Entry<String, Account> entry: accounts.entrySet()) {
 				if (entry.getValue() instanceof SavingAccount) {
 					Map<String, BigDecimal> balance = entry.getValue().getBalance();
-					if (balance.containsKey("dollar")) {
-						total = total.add(balance.get("dollar"));
+					if (balance.containsKey("USD")) {
+						total = total.add(balance.get("USD"));
 					}
 				}
 			}
@@ -433,4 +434,50 @@ public class UserController implements SystemInterface{
 		user.getLoanList().put(loanName, loan);
 		return ErrCode.OK;
 	}
+
+	/* The following method is added for stock transaction */
+	int buyStock(String username, String companyName, int count, String savingAccountNumber, String securityAccountNumber) {
+		User user = bank.getUserList().get(username);
+		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
+			return ErrCode.NOSUCHACCOUNT;
+		}
+
+		// get stock info
+		Stock stock = bank.getStockMap().get(companyName);
+		if(count <= 0) {
+			return ErrCode.MISSAMOUNT;
+		}
+		BigDecimal purchaseAmount = stock.getUnitPrice().multiply(BigDecimal.valueOf(count));
+
+		// check and deduct money from saving account
+		SavingAccount savingAccount = (SavingAccount) user.getAccounts().get(savingAccountNumber);
+		Map<String, BigDecimal> fromBalanceList = savingAccount.getBalance();
+		if(!fromBalanceList.containsKey("USD")){
+			return ErrCode.NOENOUGHMONEY;
+		}
+		BigDecimal oldBalance = fromBalanceList.get("USD");
+		BigDecimal serviceCharge = purchaseAmount.multiply(bank.getStockTransactionFee());
+		if(oldBalance.compareTo(purchaseAmount.add(serviceCharge)) < 0) {
+			return ErrCode.NOENOUGHMONEY;
+		}
+		BigDecimal newBalance = oldBalance.subtract(purchaseAmount).subtract(serviceCharge);
+		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+		fromBalanceList.put("USD", newBalance);
+		savingAccount.setBalance(fromBalanceList);
+		Transaction transactionSaving = new Transaction(username, user.getID(), "USD", new BigDecimal(count), serviceCharge, newBalance, UtilFunction.now(), companyName, Config.BUY, savingAccountNumber, securityAccountNumber);
+		savingAccount.addTransactionDetails(transactionSaving);
+		user.getAccounts().put(savingAccountNumber, savingAccount);
+
+		// put stock purchased into security account
+		HoldingStock stockRecord = new HoldingStock(companyName, stock.getUnitPrice(), new BigDecimal(count));
+		SecurityAccount securityAccount = (SecurityAccount) user.getAccounts().get(securityAccountNumber);
+		Transaction transactionSecurity = new Transaction(username, user.getID(), "USD", new BigDecimal(count), new BigDecimal("0"), purchaseAmount, UtilFunction.now(), companyName, Config.BUY, savingAccountNumber, securityAccountNumber);
+		securityAccount.getStockList().put(transactionSecurity.getTransactionId(), stockRecord);
+		securityAccount.addTransactionDetails(transactionSecurity);
+		user.getAccounts().put(securityAccountNumber, securityAccount);
+		bank.addUser(username, user);
+
+		return ErrCode.OK;
+	}
+	/* End */
 }
