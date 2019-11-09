@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jdk.jshell.execution.Util;
 import model.*;
 import utils.Config;
 import utils.ErrCode;
@@ -435,7 +436,7 @@ public class UserController implements SystemInterface{
 		return ErrCode.OK;
 	}
 
-	/* The following method is added for stock transaction */
+	/* The following method is added for stock purchase transaction */
 	int buyStock(String username, String companyName, int count, String savingAccountNumber, String securityAccountNumber) {
 		User user = bank.getUserList().get(username);
 		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
@@ -464,6 +465,7 @@ public class UserController implements SystemInterface{
 		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
 		fromBalanceList.put("USD", newBalance);
 		savingAccount.setBalance(fromBalanceList);
+
 		Transaction transactionSaving = new Transaction(username, user.getID(), "USD", new BigDecimal(count), serviceCharge, newBalance, UtilFunction.now(), companyName, Config.BUY, savingAccountNumber, securityAccountNumber);
 		savingAccount.addTransactionDetails(transactionSaving);
 		user.getAccounts().put(savingAccountNumber, savingAccount);
@@ -471,13 +473,64 @@ public class UserController implements SystemInterface{
 		// put stock purchased into security account
 		HoldingStock stockRecord = new HoldingStock(companyName, stock.getUnitPrice(), new BigDecimal(count));
 		SecurityAccount securityAccount = (SecurityAccount) user.getAccounts().get(securityAccountNumber);
+		String stockRecordId = UtilFunction.generateTransactionID();
+		securityAccount.getStockList().put(stockRecordId, stockRecord);
+
 		Transaction transactionSecurity = new Transaction(username, user.getID(), "USD", new BigDecimal(count), new BigDecimal("0"), purchaseAmount, UtilFunction.now(), companyName, Config.BUY, savingAccountNumber, securityAccountNumber);
-		securityAccount.getStockList().put(transactionSecurity.getTransactionId(), stockRecord);
 		securityAccount.addTransactionDetails(transactionSecurity);
 		user.getAccounts().put(securityAccountNumber, securityAccount);
-		bank.addUser(username, user);
 
+		bank.addUser(username, user);
 		return ErrCode.OK;
 	}
 	/* End */
+
+
+	/* The following method is added for stock selling transaction */
+	int sellStock(String username, String stockRecordId, int count, String securityAccountNumber, String savingAccountNumber) {
+		User user = bank.getUserList().get(username);
+		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
+			return ErrCode.NOSUCHACCOUNT;
+		}
+
+		SecurityAccount securityAccount = (SecurityAccount) user.getAccounts().get(securityAccountNumber);
+		SavingAccount savingAccount = (SavingAccount) user.getAccounts().get(savingAccountNumber);
+		BigDecimal sellCount = new BigDecimal(count);
+
+		// get transaction and stock info
+		HoldingStock stockRecord = securityAccount.getStockList().get(stockRecordId);
+		if (stockRecord.getNumber().compareTo(sellCount) < 0) {
+			return ErrCode.NOTENOUGHSTOCK;
+		}
+
+		// return money to saving account
+		BigDecimal returnAmount = sellCount.multiply(stockRecord.getBuyInPirce());
+		BigDecimal serviceCharge = returnAmount.multiply(bank.getStockTransactionFee());
+		BigDecimal oldBalance = savingAccount.getBalance().get("USD");
+		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+		BigDecimal newBalance = oldBalance.add(returnAmount).subtract(serviceCharge);
+		savingAccount.getBalance().put("USD", newBalance);
+
+		Transaction transactionSaving = new Transaction(username, user.getID(), "USD", sellCount, serviceCharge, newBalance,
+				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, savingAccountNumber, securityAccountNumber);
+		savingAccount.addTransactionDetails(transactionSaving);
+		user.getAccounts().put(savingAccountNumber, savingAccount);
+
+		// update stock records in security account
+		stockRecord.setNumber(stockRecord.getNumber().subtract(sellCount));
+		if (stockRecord.getNumber().compareTo(new BigDecimal("0")) == 0) {
+			securityAccount.getStockList().remove(stockRecordId);
+		}
+		else {
+			securityAccount.getStockList().put(stockRecordId, stockRecord);
+		}
+
+		Transaction transactionSecurity = new Transaction(username, user.getID(), "USD", sellCount, new BigDecimal("0"), returnAmount,
+				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, savingAccountNumber, securityAccountNumber);
+		securityAccount.addTransactionDetails(transactionSecurity);
+		user.getAccounts().put(securityAccountNumber, securityAccount);
+
+		bank.addUser(username, user);
+		return ErrCode.OK;
+	}
 }
