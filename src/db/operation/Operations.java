@@ -26,7 +26,9 @@ public class Operations {
 
     // call this method firstly
     public static boolean testDBConnection(){
-        if(getConnection() != null) return true;
+        if(getConnection() != null) {
+            System.out.println("Connect to DB successfully");
+            return true;}
         else return false;
     }
 
@@ -94,7 +96,7 @@ public class Operations {
             stmt.close();
             c.close();
         } catch (SQLException e){
-            System.err.println(ErrCode.errCodeToStr(602));
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETUSERLISTFAIL));
         }
         return userList;
     }
@@ -125,7 +127,7 @@ public class Operations {
                     case 1: account = new CheckingAccount(accountNumber, balanceMap, transactionMap);break;
                     case 2: account = new SavingAccount(accountNumber, balanceMap, transactionMap);break;
                     case 3: {
-                        account = new SecurityAccount(accountNumber, getHoldingStock(userID),new BigDecimal(0));
+                        account = new SecurityAccount(accountNumber, getHoldingStock(accountNumber), transactionMap);
                         break;
                     }
                     default: account = new Account(accountNumber, balanceMap, transactionMap);
@@ -137,7 +139,7 @@ public class Operations {
             stmt.close();
             c.close();
         } catch (SQLException e){
-            System.err.println(ErrCode.errCodeToStr(602));
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETACCOUNTMAPFAIL));
         }
         return accountList;
     }
@@ -216,7 +218,7 @@ public class Operations {
             stmt.close();
             c.close();
         } catch (SQLException e){
-            System.err.println(ErrCode.errCodeToStr(602));
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETBALANCEMAPFAIL));
         }
         return balanceMap;
     }
@@ -253,7 +255,7 @@ public class Operations {
             stmt.close();
             c.close();
         } catch (SQLException e){
-            System.err.println(ErrCode.errCodeToStr(602));
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETTRANSACNTIONFAIL));
         }
         return transactionMap;
     }
@@ -338,12 +340,12 @@ public class Operations {
         return TransactionIdList;
     }
 
-    public static Map<String, HoldingStock> getHoldingStock(int userID){
+    public static Map<String, HoldingStock> getHoldingStock(String accountNumber){
         Connection c = getConnection();
         Map<String, HoldingStock> holdingStockHashMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM HoldingStocks WHERE userID="+userID+";";
+            String sql = "SELECT * FROM HoldingStocks WHERE accountNumber='"+accountNumber+"';";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -361,8 +363,36 @@ public class Operations {
             stmt.close();
             c.close();
         } catch (SQLException e){
-            System.err.println(ErrCode.errCodeToStr(602));
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETHOLDINGSTOCKFAIL));
         }
         return holdingStockHashMap;
+    }
+
+    public static Map<String, Stock> getStockMapFromDB(){
+        Connection c = getConnection();
+        Map<String, Stock> stockMarketMap = new HashMap<>();
+        try {
+            Statement stmt = c.createStatement();
+            String sql = "SELECT * FROM Stocks;";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                // parse data
+                String company = rs.getString("company");
+                BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
+                int soldCount = rs.getInt("soldCount");
+
+                Stock stock = new Stock(company,unitPrice,soldCount);
+
+                // add to stockMarketMap
+                stockMarketMap.put(company, stock);
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+        } catch (SQLException e){
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETSTOCKMARKETFAIL));
+        }
+        return stockMarketMap;
     }
 }

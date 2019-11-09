@@ -14,8 +14,8 @@ public class SecurityAccount extends Account{
         stockList = new HashMap<>();
     }
 
-    public SecurityAccount(String accountNumber, Map<String, HoldingStock> stockList){
-        super(accountNumber);
+    public SecurityAccount(String accountNumber, Map<String, HoldingStock> stockList, Map<String, Transaction> transactionDetails){
+        super(accountNumber,transactionDetails);
         this.stockList = stockList;
     }
 

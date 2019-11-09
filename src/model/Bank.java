@@ -41,7 +41,7 @@ public class Bank{
 		accountList = Operations.getAccountMapFromDB();
         transactionIdList = Operations.getTransactionIdList();
 		// added for security account and stock
-		stockMap = new HashMap<>();
+		stockMap = Operations.getStockMapFromDB();
 		
 		balance.put(Config.DEFAULTCURRENCY, new BigDecimal("0"));
 		openAccountFee = Config.DEFAULTOPENACCOUNTFEE;

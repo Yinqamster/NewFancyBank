@@ -18,6 +18,12 @@ public class Stock {
         this.soldCount = 0;
     }
 
+    public Stock(String company, BigDecimal unitPrice, int soldCount) {
+        this.company = company;
+        this.unitPrice = unitPrice;
+        this.soldCount = soldCount;
+    }
+
     public void setCompany(String company) {
         this.company = company;
     }
