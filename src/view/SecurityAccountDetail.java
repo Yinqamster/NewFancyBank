@@ -1,5 +1,6 @@
 package view;
 
+import controller.BankController;
 import controller.UserController;
 import model.HoldingStock;
 import model.SecurityAccount;
@@ -83,6 +84,8 @@ public class SecurityAccountDetail extends JFrame {
         IDLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
         JLabel companyLabel = new JLabel("Company");
         companyLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        JLabel amountLabel = new JLabel("Amount");
+        amountLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
         JLabel currentPriceLabel = new JLabel("Current Price");
         currentPriceLabel.setFont(new Font("Helvetica", Font.PLAIN, 15));
         JLabel buyInPriceLabel = new JLabel("Buy Price");
@@ -92,6 +95,7 @@ public class SecurityAccountDetail extends JFrame {
 
         panel.add(IDLabel);
         panel.add(companyLabel);
+        panel.add(amountLabel);
         panel.add(currentPriceLabel);
         panel.add(buyInPriceLabel);
         panel.add(operationLabel);
@@ -101,8 +105,8 @@ public class SecurityAccountDetail extends JFrame {
                 String tranID = s.getKey();
                 panel.add(new JLabel(tranID));
                 panel.add(new JLabel(s.getValue().getCompanyName()));
-
-
+                panel.add(new JLabel(String.valueOf(s.getValue().getNumber())));
+                panel.add(new JLabel(String.valueOf(BankController.getBank().getStockMap().get(s.getValue().getCompanyName()).getUnitPrice())));
                 panel.add(new JLabel(String.valueOf(s.getValue().getBuyInPirce())));
                 JButton operationButton = new JButton("Sell");
                 panel.add(operationButton);
@@ -110,7 +114,7 @@ public class SecurityAccountDetail extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         SecurityAccountDetail.this.dispose();
-                        new StockTransaction(username, Config.SELL, tranID, "", "");
+                        new StockTransaction(username, Config.SELL, tranID, "", account.getSelectedItem().toString());
                     }
                 });
             }

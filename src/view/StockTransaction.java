@@ -5,6 +5,7 @@ import controller.UserController;
 import model.HoldingStock;
 import model.Stock;
 import utils.Config;
+import utils.ErrCode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,14 +23,15 @@ public class StockTransaction extends JFrame {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(null);
 
-        int rows = type == Config.BUY ? 7 : 9;
+        int rows = type == Config.BUY ? 7 : 10;
+        System.out.println(rows);
         String companyName = "";
-        String transactionID = "";
+        String stockRecordID = "";
         if(type == Config.BUY) {
             companyName = str;
         }
         else if(type == Config.SELL) {
-            transactionID = str;
+            stockRecordID = str;
         }
         JPanel panel = new JPanel();
         panel.setBounds(40, 180, 400, 50*rows);
@@ -55,8 +57,8 @@ public class StockTransaction extends JFrame {
         //TODO get stock by stock id
         Stock stock;
         HoldingStock holdingStock;
-        String cName;
-        String cPrice;
+        String cName = "";
+        String cPrice = "";
         String s = "0";
         String biP = "0";
 
@@ -66,18 +68,21 @@ public class StockTransaction extends JFrame {
             cPrice = String.valueOf(stock.getUnitPrice());
         }
         else {
-//            holdingStock = userController.getHoldingStock(username, transactionID);
-            holdingStock = new HoldingStock("", BigDecimal.ZERO, BigDecimal.ZERO);
-            stock = BankController.getBank().getStockMap().get(holdingStock.getCompanyName());
-            cName = holdingStock.getCompanyName();
-            cPrice = String.valueOf(stock.getUnitPrice());
-            s = String.valueOf(holdingStock.getNumber());
-            biP = String.valueOf(holdingStock.getBuyInPirce());
+            holdingStock = userController.getHoldingStock(username, stockRecordID, seAccNum);
+//            holdingStock = new HoldingStock("", BigDecimal.ZERO, BigDecimal.ZERO);
+            if(holdingStock != null) {
+                stock = BankController.getBank().getStockMap().get(holdingStock.getCompanyName());
+                cName = holdingStock.getCompanyName();
+                cPrice = String.valueOf(stock.getUnitPrice());
+                s = String.valueOf(holdingStock.getNumber());
+                biP = String.valueOf(holdingStock.getBuyInPirce());
+            }
+
         }
 
         JLabel tranIDLabel = new JLabel("Transaction ID: ");
         tranIDLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
-        JLabel tranID = new JLabel();
+        JLabel tranID = new JLabel(stockRecordID);
         tranID.setFont(new Font("Helvetica",Font.PLAIN,15));
         if(type == Config.SELL) {
             panel.add(tranIDLabel);
@@ -198,6 +203,30 @@ public class StockTransaction extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO invoke user controller
+                int res = -1;
+                if(type == Config.BUY) {
+                    res = userController.buyStock(username, str, size.getText(), accountList.getSelectedItem().toString(), sAccountList.getSelectedItem().toString());
+                }
+                else if(type == Config.SELL){
+                    res = userController.sellStock(username, str, sellSize.getText(), seAccNum, accountList.getSelectedItem().toString());
+                }
+                if(res == ErrCode.OK) {
+                    StockTransaction.this.dispose();
+                    if(type == Config.BUY) {
+                        new StockMarket(username, Config.USER);
+                    }
+                    else if(type == Config.SELL){
+                        new SecurityAccountDetail(username, seAccNum);
+                    }
+                }
+                else {
+                    Object[] options = {"OK"};
+                    JOptionPane.showOptionDialog(null,
+                            ErrCode.errCodeToStr(res), "Error",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                            options,
+                            options[0]);
+                }
             }
         });
 
@@ -206,10 +235,17 @@ public class StockTransaction extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StockTransaction.this.dispose();
-                new StockMarket(username, Config.USER);
+                if(type == Config.BUY) {
+                    new StockMarket(username, Config.USER);
+                }
+                else if(type == Config.SELL) {
+                    new SecurityAccountDetail(username, seAccNum);
+                }
+
             }
         });
 
+        //saving account
         accountList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -218,6 +254,7 @@ public class StockTransaction extends JFrame {
             }
         });
 
+        //security account
         sAccountList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

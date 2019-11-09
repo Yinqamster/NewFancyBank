@@ -10,12 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jdk.jshell.execution.Util;
 import model.*;
 import utils.Config;
 import utils.ErrCode;
 import utils.UtilFunction;
-import view.Transact;
 
 public class UserController implements SystemInterface{
 	
@@ -437,18 +435,22 @@ public class UserController implements SystemInterface{
 	}
 
 	/* The following method is added for stock purchase transaction */
-	int buyStock(String username, String companyName, int count, String savingAccountNumber, String securityAccountNumber) {
+	public int buyStock(String username, String companyName, String count, String savingAccountNumber, String securityAccountNumber) {
 		User user = bank.getUserList().get(username);
 		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
 			return ErrCode.NOSUCHACCOUNT;
 		}
+		if(!UtilFunction.isInteger(count)) {
+			return ErrCode.AMOUNTNOTANUMBER;
+        }
 
+		int num = Integer.parseInt(count);
 		// get stock info
 		Stock stock = bank.getStockMap().get(companyName);
-		if(count <= 0) {
+		if(num <= 0) {
 			return ErrCode.MISSAMOUNT;
 		}
-		BigDecimal purchaseAmount = stock.getUnitPrice().multiply(BigDecimal.valueOf(count));
+		BigDecimal purchaseAmount = stock.getUnitPrice().multiply(BigDecimal.valueOf(num));
 
 		// check and deduct money from saving account
 		SavingAccount savingAccount = (SavingAccount) user.getAccounts().get(savingAccountNumber);
@@ -487,10 +489,14 @@ public class UserController implements SystemInterface{
 
 
 	/* The following method is added for stock selling transaction */
-	int sellStock(String username, String stockRecordId, int count, String securityAccountNumber, String savingAccountNumber) {
+	public int sellStock(String username, String stockRecordId, String count, String securityAccountNumber, String savingAccountNumber) {
 		User user = bank.getUserList().get(username);
 		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
 			return ErrCode.NOSUCHACCOUNT;
+		}
+
+		if(!UtilFunction.isInteger(count)) {
+			return ErrCode.AMOUNTNOTANUMBER;
 		}
 
 		SecurityAccount securityAccount = (SecurityAccount) user.getAccounts().get(securityAccountNumber);
@@ -533,4 +539,21 @@ public class UserController implements SystemInterface{
 		bank.addUser(username, user);
 		return ErrCode.OK;
 	}
+
+	public HoldingStock getHoldingStock(String username, String stockRecordID, String securityAccountNumber) {
+	    if(username == null || username.isEmpty() || stockRecordID == null || stockRecordID.isEmpty()) {
+	        System.out.println("Wrong parameter!");
+	        return null;
+        }
+        if(bank.getUserList() == null || !bank.getUserList().containsKey(username)) {
+            System.out.println("Wrong parameter!");
+            return null;
+        }
+        SecurityAccount account = (SecurityAccount) getAccountDetail(username, securityAccountNumber);
+        if(!account.getStockList().containsKey(stockRecordID)) {
+            System.out.println("Wrong parameter!");
+            return null;
+        }
+        return account.getStockList().get(stockRecordID);
+    }
 }
