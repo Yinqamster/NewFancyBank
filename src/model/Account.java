@@ -30,8 +30,9 @@ public class Account {
 		this.transactionDetails = transactionDetails;
 	}
 
-	public Account(String accountNumber){
+	public Account(String accountNumber, Map<String, Transaction> transactionDetails){
 		this.accountNumber = accountNumber;
+        this.transactionDetails = transactionDetails;
 	}
 	
 //	public int getAccountType(){
