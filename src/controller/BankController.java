@@ -9,6 +9,7 @@ package controller;
 import java.math.BigDecimal;
 import java.util.*;
 
+import db.operation.Operations;
 import model.*;
 import model.Currency;
 import model.Date;
@@ -200,6 +201,11 @@ public class BankController implements SystemInterface{
 			return ErrCode.LOANCANNOTBEPASSED;
 		}
 		bank.getUserList().get(username).getLoanList().get(loanName).setStatus(Config.PASSED);
+
+		// update db
+		Loan loan = bank.getUserList().get(username).getLoanList().get(loanName);
+		Operations.updateLoanStatus(loan);
+
 		return ErrCode.OK;
 	}
 	
@@ -353,6 +359,12 @@ public class BankController implements SystemInterface{
 		                					Transaction t = new Transaction(user.getName().getNickName(), user.getID(), balance.getKey(), interests, BigDecimal.ZERO, balance.getValue().add(interests), UtilFunction.now(), null, Config.SAVINGACCOUNTINTEREST, "", account.getAccountNumber());
 		                					balance.setValue(balance.getValue().add(interests));
 		                					account.addTransactionDetails(t);
+
+		                					// update db
+											BigDecimal newUserBalance = balance.getValue();
+											String currency = balance.getKey();
+											Operations.balanceUpdateDB(account.getAccountNumber(),newUserBalance,currency,false);
+											Operations.addTransactionToDB(t);
 		                				}
 		                			}
 		                			account.setBalance(balanceList);
@@ -380,6 +392,10 @@ public class BankController implements SystemInterface{
 		boolean successful = bank.addStock(stock);
 		if(!successful)
 			return ErrCode.STOCKEXIST;
+
+		//update db
+		Operations.updateOrInsertStock(stock,0);
+
 		return ErrCode.OK;
 	}
 
@@ -395,8 +411,14 @@ public class BankController implements SystemInterface{
 		Map<String, Stock> stockMap = bank.getStockMap();
 		if(!stockMap.containsKey(company))
 			return ErrCode.STOCKNOTEXIST;
-		Stock temp = new Stock(company, modifyPrice);
+		int soldCount = stockMap.get(company).getSoldCount();
+		Stock temp = new Stock(company, modifyPrice,soldCount);
 		stockMap.put(company, temp);
+
+		//update db
+
+		Operations.updateOrInsertStock(temp, soldCount);
+
 		return ErrCode.OK;
 	}
 }
