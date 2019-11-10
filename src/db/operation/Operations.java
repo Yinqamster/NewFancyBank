@@ -18,6 +18,7 @@ import java.util.Map;
 import model.*;
 import model.Date;
 import utils.*;
+import view.Transact;
 
 public class Operations {
     // databse file path
@@ -25,19 +26,19 @@ public class Operations {
     public static final String JDBCName = "org.sqlite.JDBC";
 
     // call this method firstly
-    public static boolean testDBConnection(){
-        if(getConnection() != null) {
+    public static boolean testDBConnection() {
+        if (getConnection() != null) {
             System.out.println("Connect to DB successfully");
-            return true;}
-        else return false;
+            return true;
+        } else return false;
     }
 
-    public static Connection getConnection(){
+    public static Connection getConnection() {
         Connection c = null;
         try {
             Class.forName(JDBCName);
             c = DriverManager.getConnection(url);
-        } catch ( Exception e ) {
+        } catch (Exception e) {
             System.err.println(ErrCode.errCodeToStr(601));
         }
         return c;
@@ -54,7 +55,8 @@ public class Operations {
 //        }
 //    }
 
-    public static HashMap<String, User> getUserListFromDB(){
+    // =============================== load data from DB =======================================
+    public static HashMap<String, User> getUserListFromDB() {
         Connection c = getConnection();
         HashMap<String, User> userList = new HashMap<>();
 
@@ -69,10 +71,9 @@ public class Operations {
                 String userName = rs.getString("nickName");
                 String mname = rs.getString("middleName");
                 Name name;
-                if(mname == null){
+                if (mname == null) {
                     name = new Name(rs.getString("firstName"), rs.getString("lastName"), rs.getString("nickName"));
-                }
-                else {
+                } else {
                     name = new Name(rs.getString("firstName"), rs.getString("middleName"),
                             rs.getString("lastName"), rs.getString("nickName"));
                 }
@@ -95,19 +96,19 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETUSERLISTFAIL));
         }
         return userList;
     }
 
-    public static Map<String, Account> getAccountsByUserName(String userName){
+    public static Map<String, Account> getAccountsByUserName(String userName) {
         int userID = getUserIDFromDB(userName);
         Connection c = getConnection();
         Map<String, Account> accountList = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM Accounts WHERE userID="+userID+";";
+            String sql = "SELECT * FROM Accounts WHERE userID=" + userID + ";";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -124,13 +125,18 @@ public class Operations {
                 // new acount
                 Account account;
                 switch (accountType) {
-                    case 1: account = new CheckingAccount(accountNumber, balanceMap, transactionMap);break;
-                    case 2: account = new SavingAccount(accountNumber, balanceMap, transactionMap);break;
+                    case 1:
+                        account = new CheckingAccount(accountNumber, balanceMap, transactionMap);
+                        break;
+                    case 2:
+                        account = new SavingAccount(accountNumber, balanceMap, transactionMap);
+                        break;
                     case 3: {
                         account = new SecurityAccount(accountNumber, getHoldingStock(accountNumber), transactionMap);
                         break;
                     }
-                    default: account = new Account(accountNumber, balanceMap, transactionMap);
+                    default:
+                        account = new Account(accountNumber, balanceMap, transactionMap);
                 }
                 // add to accountList
                 accountList.put(accountNumber, account);
@@ -138,13 +144,13 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETACCOUNTMAPFAIL));
         }
         return accountList;
     }
 
-    public static HashMap<String, Currency> getCurrencyListFromDB(){
+    public static HashMap<String, Currency> getCurrencyListFromDB() {
         Connection c = getConnection();
         HashMap<String, Currency> currencyList = new HashMap<>();
         try {
@@ -158,7 +164,7 @@ public class Operations {
                 BigDecimal interestsForSavingAccount = rs.getBigDecimal("interestsForSavingAccount");
                 BigDecimal interestsForLoan = rs.getBigDecimal("interestsForLoan");
                 BigDecimal balanceForInterest = rs.getBigDecimal("balanceForInterest");
-                CurrencyConfig currencyConfig  = new CurrencyConfig(
+                CurrencyConfig currencyConfig = new CurrencyConfig(
                         serviceChargeRate,
                         interestsForSavingAccount,
                         interestsForLoan,
@@ -173,37 +179,37 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(602));
         }
         return currencyList;
     }
 
-    public static int getUserIDFromDB(String userName){
+    public static int getUserIDFromDB(String userName) {
         int userID = -1;
         Connection c = getConnection();
         Statement stmt = null;
         try {
             stmt = c.createStatement();
-            String sql = "SELECT * FROM Names WHERE nickName='" + userName +"';";
+            String sql = "SELECT * FROM Names WHERE nickName='" + userName + "';";
             ResultSet rs = stmt.executeQuery(sql);
             userID = rs.getInt("userID");
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
+        } catch (Exception e) {
+            return userID;
+        } finally {
             return userID;
         }
     }
 
-    public static Map<String, BigDecimal> getBalanceMap(String accountNumber){
+    public static Map<String, BigDecimal> getBalanceMap(String accountNumber) {
         Connection c = getConnection();
         Map<String, BigDecimal> balanceMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM balanceList WHERE accountNumber='"+accountNumber+"';";
+            String sql = "SELECT * FROM balanceList WHERE accountNumber='" + accountNumber + "';";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -217,18 +223,18 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETBALANCEMAPFAIL));
         }
         return balanceMap;
     }
 
-    public static Map<String, Transaction> getTransactionMap(String accountNumber){
+    public static Map<String, Transaction> getTransactionMap(String accountNumber) {
         Connection c = getConnection();
         Map<String, Transaction> transactionMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM transactionList WHERE accountNumber='"+accountNumber+"';";
+            String sql = "SELECT * FROM transacitonList WHERE fromAccountNumber='" + accountNumber + "' OR toAccountNumber='" + accountNumber + "';";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -246,7 +252,7 @@ public class Operations {
                 String from = rs.getString("fromAccountNumber");
                 String to = rs.getString("toAccountNumber");
 
-                Transaction transaction = new Transaction(transactionID,username,userID,currency,num,serviceCharge,balance,datetime,remarks,transactionType,from,to);
+                Transaction transaction = new Transaction(transactionID, username, userID, currency, num, serviceCharge, balance, datetime, remarks, transactionType, from, to);
 
                 // add to transactionMap
                 transactionMap.put(transactionID, transaction);
@@ -254,18 +260,18 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETTRANSACNTIONFAIL));
         }
         return transactionMap;
     }
 
-    public static Map<String, Loan> getLoanMap(int userID){
+    public static Map<String, Loan> getLoanMap(int userID) {
         Connection c = getConnection();
         Map<String, Loan> LoanMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM Loans WHERE userID="+userID+";";
+            String sql = "SELECT * FROM Loans WHERE userID=" + userID + ";";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -279,7 +285,7 @@ public class Operations {
                 int status = rs.getInt("status");
 
                 // new Loan
-                Loan loan = new Loan(name,collateral,currency,number,startDate,dueDate,status);
+                Loan loan = new Loan(name, collateral, currency, number, startDate, dueDate, status);
 
                 // add to transactionMap
                 LoanMap.put(name, loan);
@@ -287,15 +293,15 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(602));
         }
         return LoanMap;
     }
 
-    public static Map<String,String> getAccountMapFromDB(){
+    public static Map<String, String> getAccountMapFromDB() {
         Connection c = getConnection();
-        Map<String,String> AccountMap = new HashMap<>();
+        Map<String, String> AccountMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
             String sql = "SELECT * FROM accountList;";
@@ -312,18 +318,18 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(602));
         }
         return AccountMap;
     }
 
-    public static List<String> getTransactionIdList(){
+    public static List<String> getTransactionIdList() {
         Connection c = getConnection();
         List<String> TransactionIdList = new ArrayList<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM transactionList;";
+            String sql = "SELECT * FROM Transactions;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -334,18 +340,18 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(602));
         }
         return TransactionIdList;
     }
 
-    public static Map<String, HoldingStock> getHoldingStock(String accountNumber){
+    public static Map<String, HoldingStock> getHoldingStock(String accountNumber) {
         Connection c = getConnection();
         Map<String, HoldingStock> holdingStockHashMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM HoldingStocks WHERE accountNumber='"+accountNumber+"';";
+            String sql = "SELECT * FROM HoldingStocks WHERE accountNumber='" + accountNumber + "';";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -354,7 +360,7 @@ public class Operations {
                 BigDecimal buyInPrice = rs.getBigDecimal("buyInPrice");
                 BigDecimal number = rs.getBigDecimal("number");
 
-                HoldingStock holdingStock = new HoldingStock(company,buyInPrice,number);
+                HoldingStock holdingStock = new HoldingStock(company, buyInPrice, number);
 
                 // add to holdingStockHashMap
                 holdingStockHashMap.put(company, holdingStock);
@@ -362,13 +368,13 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETHOLDINGSTOCKFAIL));
         }
         return holdingStockHashMap;
     }
 
-    public static Map<String, Stock> getStockMapFromDB(){
+    public static Map<String, Stock> getStockMapFromDB() {
         Connection c = getConnection();
         Map<String, Stock> stockMarketMap = new HashMap<>();
         try {
@@ -382,7 +388,7 @@ public class Operations {
                 BigDecimal unitPrice = rs.getBigDecimal("unitPrice");
                 int soldCount = rs.getInt("soldCount");
 
-                Stock stock = new Stock(company,unitPrice,soldCount);
+                Stock stock = new Stock(company, unitPrice, soldCount);
 
                 // add to stockMarketMap
                 stockMarketMap.put(company, stock);
@@ -390,9 +396,155 @@ public class Operations {
             rs.close();
             stmt.close();
             c.close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.GETSTOCKMARKETFAIL));
         }
         return stockMarketMap;
+    }
+
+    public static Map<String, BigDecimal> getManagerBalanceMapFromDB() {
+        Connection c = getConnection();
+        Map<String, BigDecimal> ManagerBalanceMap = new HashMap<>();
+        try {
+            Statement stmt = c.createStatement();
+            String sql = "SELECT * FROM Balances WHERE isManager=1;";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                // parse data
+                String currency = rs.getString("currency");
+                BigDecimal amount = rs.getBigDecimal("amount");
+
+                // add to ManagerBalanceMap
+                ManagerBalanceMap.put(currency, amount);
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.GETMANAGERBALANCEFAIL));
+        }
+        return ManagerBalanceMap;
+    }
+
+    // ============================ insert data to DB ==================================
+
+    public static void addUserToDB(User user) {
+        // prepare data
+        int userID = user.getID();
+        Name name = user.getName();
+        String nickName = name.getNickName();
+        String firstName = name.getFirstName();
+        String middleName = name.getMiddleName();
+        String lastName = name.getLastName();
+
+        String sql = "INSERT INTO Names(nickName,firstName,middleName,lastName,userID) VALUES(?,?,?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, nickName);
+            pstmt.setString(2, firstName);
+            pstmt.setString(3, middleName);
+            pstmt.setString(4, lastName);
+            pstmt.setInt(5, userID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.INSERTNAMEFAIL));
+        }
+
+        int sex = user.getSex();
+        Long phoneNumber = user.getPhoneNumber();
+        String email = user.getEmail();
+        String dob = user.getDob().toDayString();
+        String password = user.getPassword();
+
+        sql = "INSERT INTO Users(userID,sex,phoneNumber,email,dob,password) VALUES(?,?,?,?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userID);
+            pstmt.setInt(2, sex);
+            pstmt.setLong(3, phoneNumber);
+            pstmt.setString(4, email);
+            pstmt.setString(5, dob);
+            pstmt.setString(6, password);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.INSERTUSERFAIL));
+        }
+        System.out.println("Add user to DB succeed.");
+    }
+
+    public static void deposit(String accountNumber, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency, Transaction transaction) {
+        // update balance
+        // user balance
+        balanceUpdateDB(accountNumber, newUserBalance, currency, false);
+
+        //manager balance
+        balanceUpdateDB("", newManagerBalance, currency, true);
+
+        // add transaction
+        addTransactionToDB(transaction);
+    }
+
+    public static void balanceUpdateDB(String accountNumber, BigDecimal newBalance, String currency, boolean isManager) {
+        if (!isManager) {
+            // user balance
+            String sql = "INSERT OR REPLACE INTO Balances(currency, amount, accountNumber , isManager) VALUES(?,?,?,0);";
+
+            try (Connection conn = getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, currency);
+                pstmt.setBigDecimal(2, newBalance);
+                pstmt.setString(3, accountNumber);
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println(ErrCode.errCodeToStr(ErrCode.UPDATEBALANCEFAIL));
+            }
+        } else {
+            //manager balance
+            String sql = "INSERT OR REPLACE INTO Balances(currency, amount, accountNumber , isManager) VALUES(?,?,?,1);";
+
+            try (Connection conn = getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, currency);
+                pstmt.setBigDecimal(2, newBalance);
+                pstmt.setString(3, "");
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println(ErrCode.errCodeToStr(ErrCode.UPDATEBALANCEFAIL));
+            }
+        }
+    }
+
+    public static void addTransactionToDB(Transaction transaction) {
+        // prepare data
+        String transactionID = transaction.getTransactionId();
+        int transactionType = transaction.getTransactionType();
+        String date = transaction.getDate().toTimeString();
+        String fromAccountNumber = transaction.getFromAccountNumber();
+        String toAccountNumber = transaction.getToAccountNumber();
+        String currency = transaction.getCurrency();
+        String remarks = transaction.getRemarks();
+        BigDecimal num = transaction.getNum();
+        BigDecimal serviceCharge = transaction.getServiceCharge();
+        BigDecimal balance = transaction.getBalance();
+
+        String sql = "INSERT INTO Transactions(transactionID,transactionType,date,fromAccountNumber,toAccountNumber,currency,remarks,num,serviceCharge,balance) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, transactionID);
+            pstmt.setInt(2, transactionType);
+            pstmt.setString(3, date);
+            pstmt.setString(4, fromAccountNumber);
+            pstmt.setString(5, toAccountNumber);
+            pstmt.setString(6, currency);
+            pstmt.setString(7, remarks);
+            pstmt.setBigDecimal(8, num);
+            pstmt.setBigDecimal(9, serviceCharge);
+            pstmt.setBigDecimal(10, balance);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.ADDTRANSACTIONFAIL));
+        }
     }
 }
