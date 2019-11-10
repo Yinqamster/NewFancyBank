@@ -66,7 +66,11 @@ public class ErrCode {
 	public static final int GETTRANSACNTIONFAIL = 606;
 	public static final int GETHOLDINGSTOCKFAIL = 607;
 	public static final int GETSTOCKMARKETFAIL = 608;
-	
+    public static final int GETMANAGERBALANCEFAIL = 609;
+    public static final int INSERTNAMEFAIL = 610;
+    public static final int INSERTUSERFAIL = 611;
+    public static final int UPDATEBALANCEFAIL = 612;
+    public static final int ADDTRANSACTIONFAIL = 613;
 	
 	public static String errCodeToStr(int errCode) {
 		String errString = "";
@@ -209,6 +213,21 @@ public class ErrCode {
 			case GETSTOCKMARKETFAIL:
 				errString = "Fail to Get Stock Market Map";
 				break;
+            case GETMANAGERBALANCEFAIL:
+                errString = "Fail to Get Manager's Balance Map";
+                break;
+            case INSERTNAMEFAIL:
+                errString = "Fail to Insert a Name to DB";
+                break;
+            case INSERTUSERFAIL:
+                errString = "Fail to Insert a User to DB";
+                break;
+            case UPDATEBALANCEFAIL:
+                errString = "Fail to Update Balance";
+                break;
+            case ADDTRANSACTIONFAIL:
+                errString = "Fail to Add Transaction to DB";
+                break;
 			default:
 				errString = "Error. Please try later.";
 				break;

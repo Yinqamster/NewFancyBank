@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import db.operation.Operations;
 import model.*;
 import utils.Config;
 import utils.ErrCode;
@@ -52,6 +53,10 @@ public class UserController implements SystemInterface{
 		}
 		User user = new User(name, sex, (long)Long.parseLong(phoneNum), email, UtilFunction.stringToDate(birthday), password);
 		bank.addUser(user.getName().getNickName(), user);
+
+		// add user to db
+		Operations.addUserToDB(user);
+
 //		UtilFunction.printUsers();
 		return ErrCode.OK;
 	}
@@ -146,6 +151,7 @@ public class UserController implements SystemInterface{
 		BigDecimal serviceCharge = number.multiply(currencyConfig.getServiceChargeRate());
 		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge));
 		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
 		
@@ -153,6 +159,10 @@ public class UserController implements SystemInterface{
 		account.addTransactionDetails(t);
 		user.getAccounts().put(accountNumber, account);
 		bank.addUser(username, user);
+
+		// update DB
+		Operations.deposit(accountNumber,newBalance,newManagerBalance,currency,t);
+
 		return ErrCode.OK;
 	}
 	

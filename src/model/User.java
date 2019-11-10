@@ -24,26 +24,26 @@ public class User extends Person{
 	
 	public User(Name name, int sex, long phoneNum, String email, Date birthday, String password) {
 		super(name, phoneNum, email, birthday, sex);
-//		int id = getMaxID() + 1;
 		int id = Operations.getUserIDFromDB(name.getNickName());
+		if(id == -1) id = getMaxID() + 1;
 		super.setID(id);
 		this.password = password;
 		accounts = new HashMap<String, Account>();
 		loanList = new HashMap<String, Loan>();
 	}
 	
-//	public int getMaxID(){
-//		int maxId = 0;
-//		if(BankController.getBank().getUserList().isEmpty()) {
-//			return 0;
-//		}
-//		for(User u : BankController.getBank().getUserList().values()) {
-//			if(u.getID() > maxId){
-//				maxId = u.getID();
-//			}
-//		}
-//		return maxId;
-//	}
+	public static int getMaxID(){
+		int maxId = 0;
+		if(BankController.getBank().getUserList().isEmpty()) {
+			return 0;
+		}
+		for(User u : BankController.getBank().getUserList().values()) {
+			if(u.getID() > maxId){
+				maxId = u.getID();
+			}
+		}
+		return maxId;
+	}
 	
 	public String getPassword() {
 		return this.password;
