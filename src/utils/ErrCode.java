@@ -71,6 +71,10 @@ public class ErrCode {
     public static final int INSERTUSERFAIL = 611;
     public static final int UPDATEBALANCEFAIL = 612;
     public static final int ADDTRANSACTIONFAIL = 613;
+	public static final int INSERTACCOUNTFAIL = 614;
+	public static final int INSERTLOANFAIL = 615;
+	public static final int UPDATELOANSTATUSFAIL = 616;
+	public static final int INSERTHOLDINGSTOCKFAIL = 617;
 	
 	public static String errCodeToStr(int errCode) {
 		String errString = "";
@@ -228,6 +232,18 @@ public class ErrCode {
             case ADDTRANSACTIONFAIL:
                 errString = "Fail to Add Transaction to DB";
                 break;
+			case INSERTACCOUNTFAIL:
+				errString = "Fail to Add Account to DB";
+				break;
+			case INSERTLOANFAIL:
+				errString = "Fail to Add Loan to DB";
+				break;
+			case UPDATELOANSTATUSFAIL:
+				errString = "Fail to Update Loan Status";
+				break;
+			case INSERTHOLDINGSTOCKFAIL:
+				errString = "Fail to Insert Holding Stock";
+				break;
 			default:
 				errString = "Error. Please try later.";
 				break;

@@ -271,7 +271,7 @@ public class Operations {
         Map<String, Loan> LoanMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM Loans WHERE userID=" + userID + ";";
+            String sql = "SELECT * FROM Loans WHERE userID=" + userID + " AND status<>3;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -351,11 +351,12 @@ public class Operations {
         Map<String, HoldingStock> holdingStockHashMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM HoldingStocks WHERE accountNumber='" + accountNumber + "';";
+            String sql = "SELECT * FROM HoldingStocks WHERE accountNumber='" + accountNumber + "' AND number>0;";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 // parse data
+                String stockRecordID = rs.getString("stockRecordID");
                 String company = rs.getString("company");
                 BigDecimal buyInPrice = rs.getBigDecimal("buyInPrice");
                 BigDecimal number = rs.getBigDecimal("number");
@@ -363,7 +364,7 @@ public class Operations {
                 HoldingStock holdingStock = new HoldingStock(company, buyInPrice, number);
 
                 // add to holdingStockHashMap
-                holdingStockHashMap.put(company, holdingStock);
+                holdingStockHashMap.put(stockRecordID, holdingStock);
             }
             rs.close();
             stmt.close();
@@ -427,7 +428,7 @@ public class Operations {
         return ManagerBalanceMap;
     }
 
-    // ============================ insert data to DB ==================================
+    // ============================ insert/update data to DB ==================================
 
     public static void addUserToDB(User user) {
         // prepare data
@@ -545,6 +546,234 @@ public class Operations {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println(ErrCode.errCodeToStr(ErrCode.ADDTRANSACTIONFAIL));
+        }
+    }
+
+    public static void withdraw(String accountNumber, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency, Transaction transaction) {
+        // update balance
+        // user balance
+        balanceUpdateDB(accountNumber, newUserBalance, currency, false);
+
+        //manager balance
+        balanceUpdateDB("", newManagerBalance, currency, true);
+
+        // add transaction
+        addTransactionToDB(transaction);
+    }
+
+    public static void sendMoney(String accountNumber, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency, Transaction transaction) {
+        // update balance
+        // user balance
+        balanceUpdateDB(accountNumber, newUserBalance, currency, false);
+
+        //manager balance
+        balanceUpdateDB("", newManagerBalance, currency, true);
+
+        // add transaction
+        addTransactionToDB(transaction);
+    }
+
+    public static void receiveMoney(String accountNumber, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency, Transaction transaction) {
+        // update balance
+        // user balance
+        balanceUpdateDB(accountNumber, newUserBalance, currency, false);
+
+        //manager balance
+        balanceUpdateDB("", newManagerBalance, currency, true);
+    }
+
+    public static void addAccountToDB(Account account, User user, int accountType, Transaction t, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency) {
+        // prepare dataManager
+        String accountNumber = account.getAccountNumber();
+        int userID = user.getID();
+
+        String sql = "INSERT INTO Accounts(accountNumber,accountType,userID) VALUES(?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, accountNumber);
+            pstmt.setInt(2, accountType);
+            pstmt.setInt(3, userID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.INSERTACCOUNTFAIL));
+        }
+        System.out.println("Add Account to DB succeed.");
+
+        // user balance
+        balanceUpdateDB(accountNumber, newUserBalance, currency, false);
+
+        //manager balance
+        balanceUpdateDB("", newManagerBalance, currency, true);
+
+        // add transaction
+        addTransactionToDB(t);
+    }
+
+    public static void addLoanToDB(Loan loan, User user){
+        // prepare dataManager
+        String loanName = loan.getName();
+        String currency = loan.getCurrency();
+        BigDecimal number = loan.getNumber();
+        String startDate = loan.getStartDate().toDayString();
+        String dueDate = loan.getDueDate().toDayString();
+        String collateral = loan.getCollateral();
+        int status = loan.getStatus();
+        int userID = user.getID();
+
+        String sql = "INSERT INTO Loans(name, currency, number, startDate, dueDate, collateral, status, userID) VALUES(?,?,?,?,?,?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, loanName);
+            pstmt.setString(2, currency);
+            pstmt.setBigDecimal(3, number);
+            pstmt.setString(4, startDate);
+            pstmt.setString(5, dueDate);
+            pstmt.setString(6, collateral);
+            pstmt.setInt(7, status);
+            pstmt.setInt(8, userID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to add loan");
+        }
+        System.out.println("Add Loan to DB succeed.");
+    }
+
+    public static void payLoan(Loan loan, User user, String payAccountNumber, BigDecimal newUserBalance, BigDecimal newManagerBalance){
+        int status = Config.PAIED;
+        int userID = user.getID();
+        String currency = loan.getCurrency();
+
+        // update loan status
+        // user balance
+        String sql = "UPDATE Loans SET status=? WHERE userID=? AND currency=?;";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, status);
+            pstmt.setInt(2, userID);
+            pstmt.setString(3, currency);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.UPDATELOANSTATUSFAIL));
+        }
+
+        // update balance for certain account
+        balanceUpdateDB(payAccountNumber,newUserBalance,currency,false);
+
+        // update balance for manager
+        balanceUpdateDB("",newManagerBalance,currency,true);
+
+    }
+
+    public static void buyStock(HoldingStock holdingStock, String stockRecordID, String currency, SavingAccount savingAccount, SecurityAccount securityAccount,Transaction tSaving, Transaction tSecurity, BigDecimal newManagerBalance){
+        // add holdingStock
+        String company = holdingStock.getCompanyName();
+        BigDecimal buyInPrice = holdingStock.getBuyInPirce();
+        BigDecimal number = holdingStock.getNumber();
+        String securityAccountNumber = securityAccount.getAccountNumber();
+
+        String sql = "INSERT INTO HoldingStocks(stockRecordID, company, buyInPrice, number, accountNumber) VALUES(?,?,?,?,?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, stockRecordID);
+            pstmt.setString(2, company);
+            pstmt.setBigDecimal(3, buyInPrice);
+            pstmt.setBigDecimal(4, number);
+            pstmt.setString(5, securityAccountNumber);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println(ErrCode.errCodeToStr(ErrCode.INSERTHOLDINGSTOCKFAIL));
+        }
+
+        //update stock sold count
+        updatestockSoldCount(company,number);
+
+        // update balance for saving account
+        String savingAccountNumber = savingAccount.getAccountNumber();
+        BigDecimal newUserBalance = savingAccount.getBalance().get(currency);
+        balanceUpdateDB(savingAccountNumber,newUserBalance,currency,false);
+
+        // add transaction for saving account
+        addTransactionToDB(tSaving);
+        // add transaction for security account
+        addTransactionToDB(tSecurity);
+
+        // update balance for manager
+        balanceUpdateDB("",newManagerBalance,currency,true);
+    }
+
+    public static void sellStock(HoldingStock holdingStock, String stockRecordID, String currency, SavingAccount savingAccount, SecurityAccount securityAccount,Transaction tSaving, Transaction tSecurity, BigDecimal newManagerBalance){
+        // update holdingStock
+        String company = holdingStock.getCompanyName();
+        BigDecimal number = holdingStock.getNumber();
+
+        String sql = "UPDATE HoldingStocks SET number=? WHERE stockRecordID=?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBigDecimal(1, number);
+            pstmt.setString(2, stockRecordID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to update holding stock");
+        }
+
+        //update stock sold count
+        updatestockSoldCount(company,number.multiply(new BigDecimal(-1)));
+
+        // update balance for saving account
+        String savingAccountNumber = savingAccount.getAccountNumber();
+        BigDecimal newUserBalance = savingAccount.getBalance().get(currency);
+        balanceUpdateDB(savingAccountNumber,newUserBalance,currency,false);
+
+        // add transaction for saving account
+        addTransactionToDB(tSaving);
+        // add transaction for security account
+        addTransactionToDB(tSecurity);
+
+        // update balance for manager
+        balanceUpdateDB("",newManagerBalance,currency,true);
+    }
+
+    public static void updatestockSoldCount(String company, BigDecimal number){
+        String sql = "UPDATE Stocks SET soldCount=soldCount+? WHERE company=?;";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBigDecimal(1, number);
+            pstmt.setString(2, company);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Update sold stock count fail.");
+        }
+    }
+
+    public static void updateLoanStatus(Loan loan){
+        int status = loan.getStatus();
+        String loanName = loan.getName();
+        String sql = "UPDATE Loans SET status=? WHERE name=? AND status=?;";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, status);
+            pstmt.setString(2, loanName);
+            pstmt.setInt(3, Config.PROCESSING);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Update sold Loan Status Fail.");
+        }
+    }
+
+    public static void updateOrInsertStock(Stock stock, int soldCount){
+        String company = stock.getCompany();
+        BigDecimal unitPrice = stock.getUnitPrice();
+
+        String sql = "INSERT OR REPLACE INTO Stocks(company, unitPrice, soldCount) VALUES(?,?,?);";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, company);
+            pstmt.setBigDecimal(2, unitPrice);
+            pstmt.setInt(3, soldCount);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to update or insert stock");
         }
     }
 }

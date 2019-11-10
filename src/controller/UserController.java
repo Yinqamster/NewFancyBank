@@ -118,8 +118,7 @@ public class UserController implements SystemInterface{
 		Account account = user.getAccounts().get(accountNumber);
 		return account;
 	}
-	
-	
+
 	//transact
 	public int deposit(String username, int accountType, String accountNumber, String amount, String currency, String remarks){
 		if(!bank.getCurrencyList().containsKey(currency)) {
@@ -203,12 +202,17 @@ public class UserController implements SystemInterface{
 		
 		BigDecimal newBalance = oldBalance.subtract(number).subtract(serviceCharge);
 		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
 		Transaction t = new Transaction(username, user.getID(), currency, number, serviceCharge, newBalance, UtilFunction.now(), remarks, Config.WITHDRAW, accountNumber, "");
 		account.addTransactionDetails(t);
 		user.getAccounts().put(accountNumber, account);
 		bank.addUser(username, user);
+
+		// update DB
+		Operations.withdraw(accountNumber,newBalance,newManagerBalance,currency,t);
+
 		return ErrCode.OK;
 	}
 	
@@ -248,12 +252,16 @@ public class UserController implements SystemInterface{
 		}
 		BigDecimal newBalance = oldBalance.subtract(number).subtract(serviceCharge);
 		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		fromBalanceList.put(currency, newBalance);
 		fromAccount.setBalance(fromBalanceList);
 		Transaction t = new Transaction(username, user.getID(), currency, number, serviceCharge, newBalance, UtilFunction.now(), remarks, Config.TRANSFEROUT, fromAccountNumber, toAccountNumber);
 		fromAccount.addTransactionDetails(t);
 		user.getAccounts().put(fromAccountNumber, fromAccount);
 		bank.addUser(username, user);
+
+		// update DB
+		Operations.sendMoney(fromAccountNumber,newBalance,newManagerBalance,currency,t);
 		
 		//to account
 		User toUser = bank.getUserList().get(bank.getAccountList().get(toAccountNumber));
@@ -270,6 +278,9 @@ public class UserController implements SystemInterface{
 		toAccount.addTransactionDetails(toT);
 		toUser.getAccounts().put(toAccountNumber, toAccount);
 		bank.addUser(toUser.getName().getNickName(), toUser);
+
+		// update DB
+		Operations.receiveMoney(toAccountNumber,newBalance,newManagerBalance,currency,t);
 		
 		return ErrCode.OK;
 	}
@@ -307,11 +318,16 @@ public class UserController implements SystemInterface{
 
 				BigDecimal serviceCharge = bank.getOpenAccountFee();
 				bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+				BigDecimal newManagerBalance = bank.getBalance().get(currency);
 
 				Transaction t = new Transaction(username, user.getID(), currency, new BigDecimal("0"), serviceCharge, new BigDecimal("0"), UtilFunction.now(), null, Config.OPENACCOUNT, "", accountNumber);
 				account.addTransactionDetails(t);
 				user.getAccounts().put(accountNumber, account);
 				bank.addUser(username, user);
+
+				// update DB
+				Operations.addAccountToDB(account,user,accountType,t, new BigDecimal("0"), newManagerBalance, currency);
+
 				return ErrCode.OK;
 			}
 			else {
@@ -336,6 +352,7 @@ public class UserController implements SystemInterface{
 		}
 		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge));
 		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
 		
@@ -343,6 +360,10 @@ public class UserController implements SystemInterface{
 		account.addTransactionDetails(t);
 		user.getAccounts().put(accountNumber, account);
 		bank.addUser(username, user);
+
+		// update DB
+		Operations.addAccountToDB(account,user,accountType,t, newBalance,newManagerBalance, currency);
+
 		return ErrCode.OK;
 	}
 	
@@ -404,13 +425,16 @@ public class UserController implements SystemInterface{
 		Loan loan = new Loan(name, collateral, currency, new BigDecimal(number), startDate, endDate, Config.PROCESSING);
 		user.addLoan(loan);
 		bank.addUser(username, user);
+
+        // update db
+        Operations.addLoanToDB(loan,user);
 		
 		return ErrCode.OK;
 	}
 	
 	public int payForLoan(String username, String loanName, String accountNumber) {
 		User user = bank.getUserList().get(username);
-		if(loanName.isEmpty() || loanName == null) {
+		if(loanName == null || loanName.isEmpty()) {
 			return ErrCode.LOANNAMEEMPTY;
 		}
 		if(!user.getLoanList().containsKey(loanName)) {
@@ -439,14 +463,20 @@ public class UserController implements SystemInterface{
 		Transaction transaction = new Transaction(username, user.getID(), loan.getCurrency(), loan.getNumber(), interestsForLoan, newBalance, UtilFunction.now(), null, Config.PAYFORLOAN, accountNumber, "");
 		user.getAccounts().get(accountNumber).addTransactionDetails(transaction);
 		bank.getBalance().put(loan.getCurrency(), bank.getBalance().get(loan.getCurrency()).add(interestsForLoan));
+		BigDecimal newManagerBalance = bank.getBalance().get(loan.getCurrency());
 		loan.setStatus(Config.PAIED);
 		user.getLoanList().put(loanName, loan);
+
+		// update db
+        Operations.payLoan(loan,user,accountNumber,newBalance,newManagerBalance);
+
 		return ErrCode.OK;
 	}
 
 	/* The following method is added for stock purchase transaction */
 	public int buyStock(String username, String companyName, String count, String savingAccountNumber, String securityAccountNumber) {
-		User user = bank.getUserList().get(username);
+        String currency = "USD";
+	    User user = bank.getUserList().get(username);
 		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
 			return ErrCode.NOSUCHACCOUNT;
 		}
@@ -475,6 +505,7 @@ public class UserController implements SystemInterface{
 		}
 		BigDecimal newBalance = oldBalance.subtract(purchaseAmount).subtract(serviceCharge);
 		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+        BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		fromBalanceList.put("USD", newBalance);
 		savingAccount.setBalance(fromBalanceList);
 
@@ -492,6 +523,9 @@ public class UserController implements SystemInterface{
 		securityAccount.addTransactionDetails(transactionSecurity);
 		user.getAccounts().put(securityAccountNumber, securityAccount);
 
+		// update db
+        Operations.buyStock(stockRecord,stockRecordId,currency,savingAccount,securityAccount,transactionSaving,transactionSecurity,newManagerBalance);
+
 		bank.addUser(username, user);
 		return ErrCode.OK;
 	}
@@ -500,7 +534,8 @@ public class UserController implements SystemInterface{
 
 	/* The following method is added for stock selling transaction */
 	public int sellStock(String username, String stockRecordId, String count, String securityAccountNumber, String savingAccountNumber) {
-		User user = bank.getUserList().get(username);
+        String currency = "USD";
+	    User user = bank.getUserList().get(username);
 		if(!bank.getAccountList().containsKey(savingAccountNumber) || !bank.getAccountList().containsKey(securityAccountNumber)) {
 			return ErrCode.NOSUCHACCOUNT;
 		}
@@ -511,7 +546,10 @@ public class UserController implements SystemInterface{
 
 		SecurityAccount securityAccount = (SecurityAccount) user.getAccounts().get(securityAccountNumber);
 		SavingAccount savingAccount = (SavingAccount) user.getAccounts().get(savingAccountNumber);
+
+		// *************** error here: count = "" ****************
 		BigDecimal sellCount = new BigDecimal(count);
+		// *******************************************************
 
 		// get transaction and stock info
 		HoldingStock stockRecord = securityAccount.getStockList().get(stockRecordId);
@@ -524,6 +562,7 @@ public class UserController implements SystemInterface{
 		BigDecimal serviceCharge = returnAmount.multiply(bank.getStockTransactionFee());
 		BigDecimal oldBalance = savingAccount.getBalance().get("USD");
 		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+        BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		BigDecimal newBalance = oldBalance.add(returnAmount).subtract(serviceCharge);
 		savingAccount.getBalance().put("USD", newBalance);
 
@@ -547,6 +586,10 @@ public class UserController implements SystemInterface{
 		user.getAccounts().put(securityAccountNumber, securityAccount);
 
 		bank.addUser(username, user);
+
+		// update db
+        Operations.sellStock(stockRecord,stockRecordId,stockRecordId,savingAccount,securityAccount,transactionSaving,transactionSecurity,newManagerBalance);
+
 		return ErrCode.OK;
 	}
 
