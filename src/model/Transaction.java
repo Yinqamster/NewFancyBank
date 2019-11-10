@@ -95,6 +95,10 @@ public class Transaction {
 				return "Pay For Loan";
 			case Config.SAVINGACCOUNTINTEREST:
 				return "Saving Account Interest";
+			case Config.BUY:
+				return "Stock Buy";
+			case Config.SELL:
+				return "Stock Sell";
 			default:
 				return "";
 		}

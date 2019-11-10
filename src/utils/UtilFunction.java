@@ -178,6 +178,15 @@ public class UtilFunction {
         }
         return true;
 	}
+
+	public static boolean isInteger(String str) {
+		Pattern pattern = Pattern.compile("[0-9]*");
+		Matcher isNum = pattern.matcher(str);
+		if (!isNum.matches()) {
+			return false;
+		}
+		return true;
+	}
 	
 	//get current time
 	public static Date now() {

@@ -38,6 +38,9 @@ public class Config {
 	public static final int CLOSEACCOUNT = 6;
 	public static final int PAYFORLOAN = 7;
 	public static final int SAVINGACCOUNTINTEREST = 8;
+	//stock transaction type
+	public static final int BUY = 9;
+	public static final int SELL = 10;
 	
 	
 	//default config
@@ -52,9 +55,7 @@ public class Config {
 	public static final BigDecimal DEFAULTSECURITYTHRESHOLD = new BigDecimal("500");
 	public static final BigDecimal DEFAULTSTOCKCHARGERATE = new BigDecimal("0.05");
 
-	//stock transaction type
-	public static final int BUY = 1;
-	public static final int SELL = 2;
+
 	
 	//number length
 	public static final int ACCOUNTNUMBERLENGTH = 12;
