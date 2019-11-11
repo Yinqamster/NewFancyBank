@@ -428,4 +428,17 @@ public class BankController implements SystemInterface{
 
 		return ErrCode.OK;
 	}
+
+	public int deleteStock(String company) {
+		Map<String, Stock> stockMap = bank.getStockMap();
+		Stock stock = stockMap.get(company);
+		if(stock == null) {
+			return ErrCode.STOCKNOTEXIST;
+		}
+		if(stock.getSoldCount() >= 0)  {
+			return ErrCode.HAVESOLDSTOCK;
+		}
+		stockMap.remove(company);
+		return ErrCode.OK;
+	}
 }
