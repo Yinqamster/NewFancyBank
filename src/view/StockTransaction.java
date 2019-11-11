@@ -1,3 +1,9 @@
+/**
+ * @author Group 5
+ * @description  the interface for stock transaction
+ * @system user
+ */
+
 package view;
 
 import controller.BankController;

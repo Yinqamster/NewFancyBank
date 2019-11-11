@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  This is the configuration of the project.
 */
 package utils;

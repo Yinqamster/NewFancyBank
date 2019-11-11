@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  This interface defines functions that user and manager have commonly.
 */
 package controller;

@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  This is checking account, extends from account
 */
 package model;

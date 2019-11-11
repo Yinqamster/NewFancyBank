@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  This is the entrance of the whole project.
 */
 package controller;

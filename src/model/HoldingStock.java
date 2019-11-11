@@ -1,3 +1,7 @@
+/**
+ *  @author Group 5
+ *  @description  This class records transaction information for each stock traded
+ */
 package model;
 
 import java.math.BigDecimal;

@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  the interface for identity choosing
 * @system user, manager
 */

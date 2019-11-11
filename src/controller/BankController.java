@@ -1,7 +1,7 @@
 /**
-* @author Qi Yin
-* @ID U31787103
-* @description  This is the controller for bank. It is the back end for manager system.
+* @author Group 5
+* @description  This is the controller for bank. It is the back end for manager system. Add three new method named "addNewStock"
+ * "modifyStockPrice" and "deleteStock"
 */
 
 package controller;
