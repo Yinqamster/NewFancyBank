@@ -780,8 +780,7 @@ public class Operations {
         }
     }
 
-    public static void deleteStock(Stock stock){
-        String company = stock.getCompany();
+    public static void deleteStock(String company){
         String sql = "DELETE FROM Stocks WHERE company=?;";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
