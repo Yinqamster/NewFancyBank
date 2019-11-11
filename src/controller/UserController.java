@@ -567,7 +567,7 @@ public class UserController implements SystemInterface{
 		savingAccount.getBalance().put("USD", newBalance);
 
 		Transaction transactionSaving = new Transaction(username, user.getID(), "USD", sellCount, serviceCharge, newBalance,
-				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, savingAccountNumber, securityAccountNumber);
+				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, securityAccountNumber, savingAccountNumber);
 		savingAccount.addTransactionDetails(transactionSaving);
 		user.getAccounts().put(savingAccountNumber, savingAccount);
 
@@ -581,7 +581,7 @@ public class UserController implements SystemInterface{
 		}
 
 		Transaction transactionSecurity = new Transaction(username, user.getID(), "USD", sellCount, new BigDecimal("0"), returnAmount,
-				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, savingAccountNumber, securityAccountNumber);
+				UtilFunction.now(), stockRecord.getCompanyName(), Config.SELL, securityAccountNumber, savingAccountNumber);
 		securityAccount.addTransactionDetails(transactionSecurity);
 		user.getAccounts().put(securityAccountNumber, securityAccount);
 

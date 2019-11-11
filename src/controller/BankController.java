@@ -439,6 +439,10 @@ public class BankController implements SystemInterface{
 			return ErrCode.HAVESOLDSTOCK;
 		}
 		stockMap.remove(company);
+
+		// update db
+		Operations.deleteStock(company);
+
 		return ErrCode.OK;
 	}
 }
