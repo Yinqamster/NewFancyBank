@@ -198,12 +198,10 @@ public class GetDailyReport extends JFrame{
 		
 		List<Transaction> transactionList = dailyReport.getTransactions();
 		int transactionPanelRows = dailyReport.getTransactionNum() == 0 ? 0 : dailyReport.getTransactionNum() + 1;
-		System.out.println(transactionPanelRows);
 		JScrollPane transactionScrollPanel = new JScrollPane();
 		int transactionScrollPaneHeight = 30*transactionPanelRows > 150 ? 150 : 30*transactionPanelRows;
 		transactionScrollPanel.setBounds(50, transactionLabelPanel.getY() + transactionLabelPanel.getHeight() + 5, 900, transactionScrollPaneHeight);
 
-		System.out.println(transactionList.size());
 		if(transactionList != null && transactionList.size() != 0) {
 			JPanel transactionPanel = new JPanel();
 			transactionPanel.setLayout(new GridLayout(transactionPanelRows, 10, 10, 5));
