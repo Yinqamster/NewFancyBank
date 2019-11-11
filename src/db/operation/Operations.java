@@ -234,7 +234,7 @@ public class Operations {
         Map<String, Transaction> transactionMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM transacitonList WHERE fromAccountNumber='" + accountNumber + "' OR toAccountNumber='" + accountNumber + "';";
+            String sql = "SELECT * FROM transacitonList WHERE (fromAccountNumber='" + accountNumber + "'AND transactionType<>4) OR (toAccountNumber='" + accountNumber + "' AND transactionType<>3);";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -580,6 +580,9 @@ public class Operations {
 
         //manager balance
         balanceUpdateDB("", newManagerBalance, currency, true);
+
+        // add transaction
+        addTransactionToDB(transaction);
     }
 
     public static void addAccountToDB(Account account, User user, int accountType, Transaction t, BigDecimal newUserBalance, BigDecimal newManagerBalance, String currency) {

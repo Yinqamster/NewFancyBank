@@ -215,7 +215,16 @@ public class BankController implements SystemInterface{
 		dr.setUserNumber(bank.getUserList() == null ? 0 : bank.getUserList().size());
 		dr.setOpenAccountNum(bank.getAccountList() == null ? 0 : bank.getAccountList().size());
 		dr.setTransactionNum(bank.getTransactionIdList() == null ? 0 : bank.getTransactionIdList().size());
-		
+
+		System.out.println(bank.getTransactionIdList().size());
+		int count=0;
+		for(User user: bank.getUserList().values()){
+			for(Account account: user.getAccounts().values()){
+				count += account.getTransactionDetails().size();
+			}
+		}
+		System.out.println(count);
+
 		if(bank.getUserList() != null) {
 			for(User user: bank.getUserList().values()) {
 				if(user.getAccounts() != null) {
