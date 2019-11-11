@@ -429,7 +429,7 @@ public class BankController implements SystemInterface{
 		return ErrCode.OK;
 	}
 
-	public int deleteNewStock(String company) {
+	public int deleteStock(String company) {
 		Map<String, Stock> stockMap = bank.getStockMap();
 		Stock stock = stockMap.get(company);
 		if(stock == null) {
