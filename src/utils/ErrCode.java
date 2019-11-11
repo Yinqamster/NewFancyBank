@@ -56,6 +56,7 @@ public class ErrCode {
 	public static final int STOCKNOTEXIST = 502;
 	public static final int ILLEGALINPUT = 503;
 	public static final int NOTENOUGHSTOCK = 504;
+	public static final int HAVESOLDSTOCK = 505;
 
 	// Database
 	public static final int DATABASECONNECTIONFAIL = 601;
