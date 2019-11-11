@@ -779,4 +779,17 @@ public class Operations {
             System.err.println("Fail to update or insert stock");
         }
     }
+
+    public static void deleteStock(Stock stock){
+        String company = stock.getCompany();
+        String sql = "DELETE FROM Stocks WHERE company=?;";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, company);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to delete stock");
+        }
+
+    }
 }
