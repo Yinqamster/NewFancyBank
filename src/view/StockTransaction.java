@@ -128,11 +128,12 @@ public class StockTransaction extends JFrame {
         JLabel price = new JLabel(cPrice);
         price.setFont(new Font("Helvetica",Font.PLAIN,15));
 
-        JLabel sizeLabel = new JLabel("Quantity");
+        JLabel sizeLabel = new JLabel("Quantity Held");
         sizeLabel.setFont(new Font("Helvetica",Font.PLAIN,15));
         JTextField size = new JTextField();
         if(type == Config.SELL) {
             size.setText(s);
+            size.setEditable(false);
         }
 
         JLabel sellSizeLabel = new JLabel("Sell");
