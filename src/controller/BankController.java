@@ -209,7 +209,7 @@ public class BankController implements SystemInterface{
 		return ErrCode.OK;
 	}
 	
-
+	
 	public DailyReport generateReport() {
 		DailyReport dr = new DailyReport();
 		dr.setUserNumber(bank.getUserList() == null ? 0 : bank.getUserList().size());
