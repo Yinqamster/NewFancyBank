@@ -245,6 +245,9 @@ public class ErrCode {
 			case INSERTHOLDINGSTOCKFAIL:
 				errString = "Fail to Insert Holding Stock";
 				break;
+			case HAVESOLDSTOCK:
+				errString = "Have sold stock";
+				break;
 			default:
 				errString = "Error. Please try later.";
 				break;
