@@ -234,7 +234,7 @@ public class Operations {
         Map<String, Transaction> transactionMap = new HashMap<>();
         try {
             Statement stmt = c.createStatement();
-            String sql = "SELECT * FROM transacitonList WHERE (fromAccountNumber='" + accountNumber + "'AND transactionType<>4) OR (toAccountNumber='" + accountNumber + "' AND transactionType<>3);";
+            String sql = "SELECT * FROM transacitonList WHERE (fromAccountNumber='" + accountNumber + "'AND (transactionType<>4 AND transactionType<>9)) OR (toAccountNumber='" + accountNumber + "' AND (transactionType<>3 AND transactionType<>10));";
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -720,6 +720,10 @@ public class Operations {
             System.err.println("Fail to update holding stock");
         }
 
+        if(number.equals(new BigDecimal("0"))){
+            deleteHoldingStock(stockRecordID);
+        }
+
         //update stock sold count
         updatestockSoldCount(company,number.multiply(new BigDecimal(-1)).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 
@@ -778,5 +782,28 @@ public class Operations {
         } catch (SQLException e) {
             System.err.println("Fail to update or insert stock");
         }
+    }
+
+    public static void deleteHoldingStock(String stockRecordID){
+        String sql = "DELETE FROM HoldingStocks WHERE stockRecordID=?;";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, stockRecordID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to delete holding stock");
+        }
+    }
+
+    public static void deleteStock(String company){
+        String sql = "DELETE FROM Stocks WHERE company=?;";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, company);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Fail to delete stock");
+        }
+
     }
 }
