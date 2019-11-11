@@ -280,7 +280,7 @@ public class UserController implements SystemInterface{
 		bank.addUser(toUser.getName().getNickName(), toUser);
 
 		// update DB
-		Operations.receiveMoney(toAccountNumber,newBalance,newManagerBalance,currency,t);
+		Operations.receiveMoney(toAccountNumber,toNewBalance,newManagerBalance,currency,toT);
 		
 		return ErrCode.OK;
 	}
