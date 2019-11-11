@@ -721,7 +721,7 @@ public class Operations {
         }
 
         //update stock sold count
-        updatestockSoldCount(company,number.multiply(new BigDecimal(-1)));
+        updatestockSoldCount(company,number.multiply(new BigDecimal(-1)).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 
         // update balance for saving account
         String savingAccountNumber = savingAccount.getAccountNumber();

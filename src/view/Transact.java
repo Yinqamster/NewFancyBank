@@ -276,10 +276,10 @@ public class Transact extends JFrame{
 				String remark = rem.getText();
 				int res = -1;
 				int accountType = 0;
-				if(userController.getAccountDetail(username, toAccountNumber) instanceof CheckingAccount) {
+				if(userController.getAccountDetail(username, fromAccountNumber) instanceof CheckingAccount) {
 					accountType = Config.CHECKINGACCOUNT;
 				}
-				else if(userController.getAccountDetail(username, toAccountNumber) instanceof SavingAccount) {
+				else if(userController.getAccountDetail(username, fromAccountNumber) instanceof SavingAccount) {
 					accountType = Config.SAVINGACCOUNT;
 				}
 				

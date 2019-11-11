@@ -147,9 +147,9 @@ public class UserController implements SystemInterface{
 		if(balanceList.containsKey(currency)){
 			oldBalance = balanceList.get(currency);
 		}
-		BigDecimal serviceCharge = number.multiply(currencyConfig.getServiceChargeRate());
-		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge));
-		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal serviceCharge = number.multiply(currencyConfig.getServiceChargeRate()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge)).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
@@ -193,15 +193,15 @@ public class UserController implements SystemInterface{
 			return ErrCode.NOENOUGHMONEY;
 		}
 		BigDecimal oldBalance = balanceList.get(currency);
-		BigDecimal serviceCharge = number.multiply(currencyConfig.getServiceChargeRate());
+		BigDecimal serviceCharge = number.multiply(currencyConfig.getServiceChargeRate()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 		
 		//balance must bigger than withdraw number add service charge
-		if(oldBalance.compareTo(number.add(serviceCharge)) < 0) {
+		if(oldBalance.compareTo(number.add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING)) < 0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
 		
-		BigDecimal newBalance = oldBalance.subtract(number).subtract(serviceCharge);
-		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newBalance = oldBalance.subtract(number).subtract(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
@@ -246,12 +246,12 @@ public class UserController implements SystemInterface{
 			return ErrCode.NOENOUGHMONEY;
 		}
 		BigDecimal oldBalance = fromBalanceList.get(currency);
-		BigDecimal serviceCharge = fromAccount instanceof SavingAccount ? new BigDecimal("0") : number.multiply(currencyConfig.getServiceChargeRate());
-		if(oldBalance.compareTo(number.add(serviceCharge)) < 0) {
+		BigDecimal serviceCharge = fromAccount instanceof SavingAccount ? new BigDecimal("0") : number.multiply(currencyConfig.getServiceChargeRate()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		if(oldBalance.compareTo(number.add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING)) < 0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
 		BigDecimal newBalance = oldBalance.subtract(number).subtract(serviceCharge);
-		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		fromBalanceList.put(currency, newBalance);
 		fromAccount.setBalance(fromBalanceList);
@@ -317,7 +317,7 @@ public class UserController implements SystemInterface{
 				account.setAccountNumber(accountNumber);
 
 				BigDecimal serviceCharge = bank.getOpenAccountFee();
-				bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+				bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 				BigDecimal newManagerBalance = bank.getBalance().get(currency);
 
 				Transaction t = new Transaction(username, user.getID(), currency, new BigDecimal("0"), serviceCharge, new BigDecimal("0"), UtilFunction.now(), null, Config.OPENACCOUNT, "", accountNumber);
@@ -350,8 +350,8 @@ public class UserController implements SystemInterface{
 		if(number.compareTo(serviceCharge) < 0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
-		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge));
-		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge));
+		BigDecimal newBalance = oldBalance.add(number.subtract(serviceCharge)).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		bank.getBalance().put(currency, bank.getBalance().get(currency).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		balanceList.put(currency, newBalance);
 		account.setBalance(balanceList);
@@ -376,7 +376,7 @@ public class UserController implements SystemInterface{
 				|| balanceList.get(Config.DEFAULTCURRENCY).compareTo(serviceCharge) < 0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
-		bank.getBalance().put(Config.DEFAULTCURRENCY, bank.getBalance().get(Config.DEFAULTCURRENCY).add(serviceCharge));
+		bank.getBalance().put(Config.DEFAULTCURRENCY, bank.getBalance().get(Config.DEFAULTCURRENCY).add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		user.getAccounts().remove(accountNumber);
 		bank.getAccountList().remove(accountNumber);
 		bank.addUser(username, user);
@@ -452,17 +452,17 @@ public class UserController implements SystemInterface{
 		BigDecimal interestRate = bank.getCurrencyList().get(loan.getCurrency()).getConfig().getInterestsForLoan();
 		BigDecimal interestsForLoan = loan.getNumber().multiply(interestRate)
 				.multiply(new BigDecimal(days))
-				.divide(new BigDecimal("365"), 4, BigDecimal.ROUND_CEILING);
+				.divide(new BigDecimal("365"), Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 		BigDecimal oldBalance = user.getAccounts().get(accountNumber).getBalance().get(loan.getCurrency());
 		if(!user.getAccounts().get(accountNumber).getBalance().containsKey(loan.getCurrency())
-				|| oldBalance.compareTo(loan.getNumber().add(interestsForLoan))<0) {
+				|| oldBalance.compareTo(loan.getNumber().add(interestsForLoan).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING))<0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
-		BigDecimal newBalance = oldBalance.subtract(loan.getNumber()).subtract(interestsForLoan);
+		BigDecimal newBalance = oldBalance.subtract(loan.getNumber()).subtract(interestsForLoan).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 		user.getAccounts().get(accountNumber).getBalance().put(loan.getCurrency(), newBalance);
 		Transaction transaction = new Transaction(username, user.getID(), loan.getCurrency(), loan.getNumber(), interestsForLoan, newBalance, UtilFunction.now(), null, Config.PAYFORLOAN, accountNumber, "");
 		user.getAccounts().get(accountNumber).addTransactionDetails(transaction);
-		bank.getBalance().put(loan.getCurrency(), bank.getBalance().get(loan.getCurrency()).add(interestsForLoan));
+		bank.getBalance().put(loan.getCurrency(), bank.getBalance().get(loan.getCurrency()).add(interestsForLoan).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		BigDecimal newManagerBalance = bank.getBalance().get(loan.getCurrency());
 		loan.setStatus(Config.PAIED);
 		user.getLoanList().put(loanName, loan);
@@ -490,7 +490,7 @@ public class UserController implements SystemInterface{
 		if(num <= 0) {
 			return ErrCode.MISSAMOUNT;
 		}
-		BigDecimal purchaseAmount = stock.getUnitPrice().multiply(BigDecimal.valueOf(num));
+		BigDecimal purchaseAmount = stock.getUnitPrice().multiply(BigDecimal.valueOf(num)).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 
 		// check and deduct money from saving account
 		SavingAccount savingAccount = (SavingAccount) user.getAccounts().get(savingAccountNumber);
@@ -499,12 +499,12 @@ public class UserController implements SystemInterface{
 			return ErrCode.NOENOUGHMONEY;
 		}
 		BigDecimal oldBalance = fromBalanceList.get("USD");
-		BigDecimal serviceCharge = purchaseAmount.multiply(bank.getStockTransactionFee());
-		if(oldBalance.compareTo(purchaseAmount.add(serviceCharge)) < 0) {
+		BigDecimal serviceCharge = purchaseAmount.multiply(bank.getStockTransactionFee()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		if(oldBalance.compareTo(purchaseAmount.add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING)) < 0) {
 			return ErrCode.NOENOUGHMONEY;
 		}
-		BigDecimal newBalance = oldBalance.subtract(purchaseAmount).subtract(serviceCharge);
-		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+		BigDecimal newBalance = oldBalance.subtract(purchaseAmount).subtract(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
         BigDecimal newManagerBalance = bank.getBalance().get(currency);
 		fromBalanceList.put("USD", newBalance);
 		savingAccount.setBalance(fromBalanceList);
@@ -558,12 +558,12 @@ public class UserController implements SystemInterface{
 		}
 
 		// return money to saving account
-		BigDecimal returnAmount = sellCount.multiply(stockRecord.getBuyInPirce());
-		BigDecimal serviceCharge = returnAmount.multiply(bank.getStockTransactionFee());
+		BigDecimal returnAmount = sellCount.multiply(stockRecord.getBuyInPirce()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
+		BigDecimal serviceCharge = returnAmount.multiply(bank.getStockTransactionFee()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 		BigDecimal oldBalance = savingAccount.getBalance().get("USD");
-		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge));
+		bank.getBalance().put("USD", bank.getBalance().get("USD").add(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
         BigDecimal newManagerBalance = bank.getBalance().get(currency);
-		BigDecimal newBalance = oldBalance.add(returnAmount).subtract(serviceCharge);
+		BigDecimal newBalance = oldBalance.add(returnAmount).subtract(serviceCharge).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING);
 		savingAccount.getBalance().put("USD", newBalance);
 
 		Transaction transactionSaving = new Transaction(username, user.getID(), "USD", sellCount, serviceCharge, newBalance,
@@ -572,7 +572,7 @@ public class UserController implements SystemInterface{
 		user.getAccounts().put(savingAccountNumber, savingAccount);
 
 		// update stock records in security account
-		stockRecord.setNumber(stockRecord.getNumber().subtract(sellCount));
+		stockRecord.setNumber(stockRecord.getNumber().subtract(sellCount).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		if (stockRecord.getNumber().compareTo(new BigDecimal("0")) == 0) {
 			securityAccount.getStockList().remove(stockRecordId);
 		}

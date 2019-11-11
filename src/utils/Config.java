@@ -78,6 +78,8 @@ public class Config {
 	//sex
 	public static  final int MALE = 1;
 	public static  final int FEMALE = 2;
+
+	public static final int DECIMALDIGITS = 2;
 	
 	//root path
 	//if use IDE, change to ./src/img/

@@ -216,14 +216,9 @@ public class BankController implements SystemInterface{
 		dr.setOpenAccountNum(bank.getAccountList() == null ? 0 : bank.getAccountList().size());
 		dr.setTransactionNum(bank.getTransactionIdList() == null ? 0 : bank.getTransactionIdList().size());
 
-		System.out.println(bank.getTransactionIdList().size());
-		int count=0;
-		for(User user: bank.getUserList().values()){
-			for(Account account: user.getAccounts().values()){
-				count += account.getTransactionDetails().size();
-			}
-		}
-		System.out.println(count);
+		System.out.println("1:" + bank.getUserList().size());
+		System.out.println("2:" + bank.getAccountList().size());
+		System.out.println("3:" + bank.getTransactionIdList().size());
 
 		if(bank.getUserList() != null) {
 			for(User user: bank.getUserList().values()) {
@@ -234,7 +229,7 @@ public class BankController implements SystemInterface{
 								switch (transaction.getTransactionType()) {
 								case Config.DEPOSIT:
 									if(dr.getCurrencyIn().containsKey(transaction.getCurrency())) {
-										dr.getCurrencyIn().put(transaction.getCurrency(), dr.getCurrencyIn().get(transaction.getCurrency()).add(transaction.getNum()));
+										dr.getCurrencyIn().put(transaction.getCurrency(), dr.getCurrencyIn().get(transaction.getCurrency()).add(transaction.getNum()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 									}
 									else {
 										dr.getCurrencyIn().put(transaction.getCurrency(), transaction.getNum());
@@ -243,7 +238,7 @@ public class BankController implements SystemInterface{
 									
 								case Config.WITHDRAW:
 									if(dr.getCurrencyOut().containsKey(transaction.getCurrency())) {
-										dr.getCurrencyOut().put(transaction.getCurrency(), dr.getCurrencyOut().get(transaction.getCurrency()).add(transaction.getNum()));
+										dr.getCurrencyOut().put(transaction.getCurrency(), dr.getCurrencyOut().get(transaction.getCurrency()).add(transaction.getNum()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 									}
 									else {
 										dr.getCurrencyOut().put(transaction.getCurrency(), transaction.getNum());
@@ -254,7 +249,7 @@ public class BankController implements SystemInterface{
 									break;
 								}
 								if(dr.getServiceCharge().containsKey(transaction.getCurrency())) {
-									dr.getServiceCharge().put(transaction.getCurrency(), dr.getServiceCharge().get(transaction.getCurrency()).add(transaction.getServiceCharge()));
+									dr.getServiceCharge().put(transaction.getCurrency(), dr.getServiceCharge().get(transaction.getCurrency()).add(transaction.getServiceCharge()).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 								}
 								else {
 									dr.getServiceCharge().put(transaction.getCurrency(), transaction.getServiceCharge());
@@ -266,7 +261,10 @@ public class BankController implements SystemInterface{
 				}
 			}
 		}
-		
+
+		System.out.println("a" + dr.getTransactions().size());
+		System.out.println("b" + dr.getTransactionNum());
+
 		dr.getTransactions().sort(new Comparator<Transaction>() {
 
 			@Override
@@ -364,9 +362,9 @@ public class BankController implements SystemInterface{
 		                				BigDecimal balanceForInterest = bank.getCurrencyList().get(balance.getKey()).getConfig().getBalanceForInterest();
 		                				if(balance.getValue().compareTo(balanceForInterest) >= 0) {
 		                					BigDecimal interestsRate = bank.getCurrencyList().get(balance.getKey()).getConfig().getInterestsForSavingAccount();
-		                					BigDecimal interests = balance.getValue().multiply(interestsRate).divide(new BigDecimal("365"), 4, BigDecimal.ROUND_FLOOR);
+		                					BigDecimal interests = balance.getValue().multiply(interestsRate).divide(new BigDecimal("365"), Config.DECIMALDIGITS, BigDecimal.ROUND_FLOOR);
 		                					Transaction t = new Transaction(user.getName().getNickName(), user.getID(), balance.getKey(), interests, BigDecimal.ZERO, balance.getValue().add(interests), UtilFunction.now(), null, Config.SAVINGACCOUNTINTEREST, "", account.getAccountNumber());
-		                					balance.setValue(balance.getValue().add(interests));
+		                					balance.setValue(balance.getValue().add(interests).setScale(Config.DECIMALDIGITS, BigDecimal.ROUND_CEILING));
 		                					account.addTransactionDetails(t);
 
 		                					// update db
