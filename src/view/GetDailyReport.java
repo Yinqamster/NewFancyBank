@@ -103,7 +103,7 @@ public class GetDailyReport extends JFrame{
 		Map<String, BigDecimal> currencyInList = dailyReport.getCurrencyIn();
 		int currencyInPanelRows = currencyInList.size() == 0 ? 0 : currencyInList.size() + 1;
 		JScrollPane currencyInScrollPanel = new JScrollPane();
-		int currencyInScrollPaneHeight = 25*currencyInPanelRows > 100 ? 100 : 25*currencyInPanelRows;
+		int currencyInScrollPaneHeight = 25*currencyInPanelRows > 50 ? 50 : 25*currencyInPanelRows;
 		currencyInScrollPanel.setBounds(50, currencyInLabelPanel.getY() + currencyInLabelPanel.getHeight() + 5, 900, currencyInScrollPaneHeight);
 		
 		if(currencyInList.size() != 0) {
@@ -135,7 +135,7 @@ public class GetDailyReport extends JFrame{
 		Map<String, BigDecimal> currencyOutList = dailyReport.getCurrencyOut();
 		int currencyOutPanelRows = currencyOutList.size() == 0 ? 0 : currencyOutList.size() + 1;
 		JScrollPane currencyOutScrollPanel = new JScrollPane();
-		int currencyOutScrollPaneHeight = 25*currencyOutPanelRows > 100 ? 100 : 25*currencyOutPanelRows;
+		int currencyOutScrollPaneHeight = 25*currencyOutPanelRows > 50 ? 50 : 25*currencyOutPanelRows;
 		currencyOutScrollPanel.setBounds(50, currencyOutLabelPanel.getY() + currencyOutLabelPanel.getHeight() + 5, 900, currencyOutScrollPaneHeight);
 		
 		if(currencyOutList.size() != 0) {
@@ -167,7 +167,7 @@ public class GetDailyReport extends JFrame{
 		Map<String, BigDecimal> serviceChargeList = dailyReport.getServiceCharge();
 		int serviceChargePanelRows = serviceChargeList.size() == 0 ? 0 : serviceChargeList.size() + 1;
 		JScrollPane serviceChargeScrollPanel = new JScrollPane();
-		int serviceChargeScrollPaneHeight = 25*serviceChargePanelRows > 100 ? 100 : 25*serviceChargePanelRows;
+		int serviceChargeScrollPaneHeight = 25*serviceChargePanelRows > 50 ? 50 : 25*serviceChargePanelRows;
 		serviceChargeScrollPanel.setBounds(50, serviceChargeLabelPanel.getY() + serviceChargeLabelPanel.getHeight() + 5, 900, serviceChargeScrollPaneHeight);
 		
 		if(serviceChargeList.size() != 0) {
@@ -198,10 +198,12 @@ public class GetDailyReport extends JFrame{
 		
 		List<Transaction> transactionList = dailyReport.getTransactions();
 		int transactionPanelRows = dailyReport.getTransactionNum() == 0 ? 0 : dailyReport.getTransactionNum() + 1;
+		System.out.println(transactionPanelRows);
 		JScrollPane transactionScrollPanel = new JScrollPane();
 		int transactionScrollPaneHeight = 30*transactionPanelRows > 150 ? 150 : 30*transactionPanelRows;
 		transactionScrollPanel.setBounds(50, transactionLabelPanel.getY() + transactionLabelPanel.getHeight() + 5, 900, transactionScrollPaneHeight);
-		
+
+		System.out.println(transactionList.size());
 		if(transactionList != null && transactionList.size() != 0) {
 			JPanel transactionPanel = new JPanel();
 			transactionPanel.setLayout(new GridLayout(transactionPanelRows, 10, 10, 5));
@@ -246,6 +248,7 @@ public class GetDailyReport extends JFrame{
 				transactionPanel.add(new JLabel(t.getCurrency()));
 				switch (t.getTransactionType()) {
 				case Config.DEPOSIT:
+				case Config.OPENACCOUNT:
 					transactionPanel.add(new JLabel("Cash"));
 					transactionPanel.add(new JLabel(t.getToAccountNumber()));
 					break;
@@ -254,21 +257,16 @@ public class GetDailyReport extends JFrame{
 					transactionPanel.add(new JLabel("Cash"));
 					break;
 				case Config.TRANSFEROUT:
-					transactionPanel.add(new JLabel(t.getFromAccountNumber()));
-					transactionPanel.add(new JLabel(t.getToAccountNumber()));
-					break;
 				case Config.RECEIVE:
+				case Config.BUY:
+				case Config.SELL:
 					transactionPanel.add(new JLabel(t.getFromAccountNumber()));
-					transactionPanel.add(new JLabel(t.getToAccountNumber()));
-					break;
-				case Config.OPENACCOUNT:
-					transactionPanel.add(new JLabel("Cash"));
 					transactionPanel.add(new JLabel(t.getToAccountNumber()));
 					break;
 				case Config.PAYFORLOAN:
 					transactionPanel.add(new JLabel(t.getFromAccountNumber()));
 					transactionPanel.add(new JLabel("Loan"));
-					break;
+				break;
 				case Config.SAVINGACCOUNTINTEREST:
 					transactionPanel.add(new JLabel("Bank"));
 					transactionPanel.add(new JLabel(t.getToAccountNumber()));

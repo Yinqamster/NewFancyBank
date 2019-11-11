@@ -205,7 +205,7 @@ public class UserDetail extends JFrame{
 			Map<String, BigDecimal> balanceList = selectedAccount.getBalance();
 			int balancePanelRows = balanceList == null || balanceList.size() == 0 ? 0 : balanceList.size() + 1;
 
-			int balanceScrollPaneHeight = 25 * balancePanelRows > 100 ? 100 : 25 * balancePanelRows;
+			int balanceScrollPaneHeight = 25 * balancePanelRows > 50 ? 50 : 25 * balancePanelRows;
 			balanceScrollPanel.setBounds(50, balanceLabelPanel.getY() + balanceLabelPanel.getHeight() + 5, 900, balanceScrollPaneHeight);
 
 			if (balanceList != null && balanceList.size() != 0) {
@@ -232,7 +232,7 @@ public class UserDetail extends JFrame{
 			Map<String, HoldingStock> stockList = ((SecurityAccount) selectedAccount).getStockList();
 			int stockPanelRows = stockList == null || stockList.size() == 0 ? 0 : stockList.size() + 1;
 
-			int stockScrollPaneHeight = 25 * stockPanelRows > 100 ? 100 : 25 * stockPanelRows;
+			int stockScrollPaneHeight = 25 * stockPanelRows > 50 ? 50 : 25 * stockPanelRows;
 			stockScrollPanel.setBounds(50, stockLabelPanel.getY() + stockLabelPanel.getHeight() + 5, 900, stockScrollPaneHeight);
 
 			if (stockList != null && stockList.size() != 0) {
@@ -261,6 +261,9 @@ public class UserDetail extends JFrame{
 			}
 			transactionLabelPanelHeight = stockScrollPanel.getY() + stockScrollPanel.getHeight() + 20;
 		}
+		else {
+			transactionLabelPanelHeight = accountTitlePanel.getY() + accountTitlePanel.getHeight() + 20;
+		}
 
 
 		JPanel transactionLabelPanel = new JPanel();
@@ -274,7 +277,7 @@ public class UserDetail extends JFrame{
 		Map<String, Transaction> transactionList = selectedAccount.getTransactionDetails();
 		int transactionPanelRows = transactionList == null || transactionList.size() == 0 ? 0 : transactionList.size() + 1;
 		JScrollPane transactionScrollPanel = new JScrollPane();
-		int transactionScrollPaneHeight = 30*transactionPanelRows > 150 ? 150 : 30*transactionPanelRows;
+		int transactionScrollPaneHeight = 30*transactionPanelRows > 90 ? 90 : 30*transactionPanelRows;
 		transactionScrollPanel.setBounds(50, transactionLabelPanel.getY() + transactionLabelPanel.getHeight() + 5, 900, transactionScrollPaneHeight);
 		
 		if(transactionList != null && transactionList.size() != 0) {
@@ -320,9 +323,9 @@ public class UserDetail extends JFrame{
 		
 		int loanRows = loans == null || loans.size() == 0 ? 0 : loans.size() + 1;
 		JScrollPane loanScrollPanel = new JScrollPane();
-		int loanScrollPaneHeight = 30*loanRows > 150 ? 150 : 30*loanRows;
+		int loanScrollPaneHeight = 30*loanRows > 90 ? 90 : 30*loanRows;
 		loanScrollPanel.setBounds(50, loanLabelPanel.getY() + loanLabelPanel.getHeight() + 5, 900, loanScrollPaneHeight);
-		
+
 		if(loans != null || loans.size() != 0) {
 			JPanel loanPanel = new JPanel();
 			loanPanel.setLayout(new GridLayout(loanRows, 8, 0, 5));
