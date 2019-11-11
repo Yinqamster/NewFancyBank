@@ -98,8 +98,7 @@ public class StockMarket extends JFrame {
                     delButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-//                            int res = managerController.deleteStock(companyName);
-                            int res = 0;
+                            int res = managerController.deleteStock(companyName);
                             if(res == ErrCode.OK) {
                                 StockMarket.this.dispose();
                                 new StockMarket(username, identity);

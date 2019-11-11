@@ -435,7 +435,7 @@ public class BankController implements SystemInterface{
 		if(stock == null) {
 			return ErrCode.STOCKNOTEXIST;
 		}
-		if(stock.getSoldCount() >= 0)  {
+		if(stock.getSoldCount() > 0)  {
 			return ErrCode.HAVESOLDSTOCK;
 		}
 		stockMap.remove(company);
