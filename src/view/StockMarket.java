@@ -78,6 +78,7 @@ public class StockMarket extends JFrame {
                 panel.add(new JLabel(String.valueOf(s.getUnitPrice())));
                 if(identity.equals(Config.USER)) {
                     JButton operationButton = new JButton("Buy");
+                    panel.add(operationButton);
                     operationButton.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
