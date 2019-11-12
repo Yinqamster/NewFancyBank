@@ -1,7 +1,7 @@
 /**
-* @author Qi Yin
-* @ID U31787103
-* @description  This is the controller for user. It is the back end for user system.
+* @author Group 5
+* @description  This is the controller for user. It is the back end for user system. Add new method named "getHoldingStock",
+ * "sellStock", "buyStock"
 */
 package controller;
 

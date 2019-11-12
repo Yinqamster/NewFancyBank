@@ -1,3 +1,9 @@
+/**
+ * @author Group 5
+ * @description  the interface for stock market
+ * @system user
+ */
+
 package view;
 
 import controller.BankController;
@@ -70,28 +76,50 @@ public class StockMarket extends JFrame {
                 String companyName = s.getCompany();
                 panel.add(new JLabel(companyName));
                 panel.add(new JLabel(String.valueOf(s.getUnitPrice())));
-                JButton operationButton = new JButton();
                 if(identity.equals(Config.USER)) {
-                    operationButton.setText("Buy");
-                }
-                else if(identity.equals(Config.MANAGER)) {
-                    operationButton.setText("Edit");
-                }
-                panel.add(operationButton);
-                operationButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        StockMarket.this.dispose();
-                        if(identity.equals(Config.USER)) {
+                    JButton operationButton = new JButton("Buy");
+                    operationButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            StockMarket.this.dispose();
                             new StockTransaction(username, Config.BUY, companyName, "", "");
                         }
-                        else if(identity.equals(Config.MANAGER)) {
+                    });
+
+                }
+                else if(identity.equals(Config.MANAGER)) {
+                    JPanel operationPanel = new JPanel(new GridLayout(1,2));
+                    JButton editButton = new JButton("Edit");
+                    JButton delButton = new JButton("Del");
+                    operationPanel.add(editButton);
+                    operationPanel.add(delButton);
+                    panel.add(operationPanel);
+                    editButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            StockMarket.this.dispose();
                             new StockManagement(companyName);
                         }
-
-
-                    }
-                });
+                    });
+                    delButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int res = managerController.deleteStock(companyName);
+                            if(res == ErrCode.OK) {
+                                StockMarket.this.dispose();
+                                new StockMarket(username, identity);
+                            }
+                            else {
+                                Object[] options = {"OK"};
+                                JOptionPane.showOptionDialog(null,
+                                        ErrCode.errCodeToStr(res), "Error",
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                                        options,
+                                        options[0]);
+                            }
+                        }
+                    });
+                }
             }
         }
 

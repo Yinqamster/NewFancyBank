@@ -1,7 +1,7 @@
 /**
-* @author Qi Yin
-* @ID U31787103
-* @description  This is the controller for bank. It is the back end for manager system.
+* @author Group 5
+* @description  This is the controller for bank. It is the back end for manager system. Add three new method named "addNewStock"
+ * "modifyStockPrice" and "deleteStock"
 */
 
 package controller;
@@ -216,10 +216,6 @@ public class BankController implements SystemInterface{
 		dr.setOpenAccountNum(bank.getAccountList() == null ? 0 : bank.getAccountList().size());
 		dr.setTransactionNum(bank.getTransactionIdList() == null ? 0 : bank.getTransactionIdList().size());
 
-		System.out.println("1:" + bank.getUserList().size());
-		System.out.println("2:" + bank.getAccountList().size());
-		System.out.println("3:" + bank.getTransactionIdList().size());
-
 		if(bank.getUserList() != null) {
 			for(User user: bank.getUserList().values()) {
 				if(user.getAccounts() != null) {
@@ -261,9 +257,6 @@ public class BankController implements SystemInterface{
 				}
 			}
 		}
-
-		System.out.println("a" + dr.getTransactions().size());
-		System.out.println("b" + dr.getTransactionNum());
 
 		dr.getTransactions().sort(new Comparator<Transaction>() {
 
@@ -435,7 +428,7 @@ public class BankController implements SystemInterface{
 		if(stock == null) {
 			return ErrCode.STOCKNOTEXIST;
 		}
-		if(stock.getSoldCount() >= 0)  {
+		if(stock.getSoldCount() > 0)  {
 			return ErrCode.HAVESOLDSTOCK;
 		}
 		stockMap.remove(company);

@@ -1,6 +1,5 @@
 /**
- * @author Qi Yin
- * @ID U31787103
+ * @author Group
  * @description This is the data structure for bank
  */
 package model;

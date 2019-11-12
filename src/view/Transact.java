@@ -1,6 +1,5 @@
 /**
-* @author Qi Yin
-* @ID U31787103
+* @author Group 5
 * @description  the interface for transacting
 * @system user
 */
@@ -276,11 +275,22 @@ public class Transact extends JFrame{
 				String remark = rem.getText();
 				int res = -1;
 				int accountType = 0;
-				if(userController.getAccountDetail(username, fromAccountNumber) instanceof CheckingAccount) {
-					accountType = Config.CHECKINGACCOUNT;
+
+				if(transactionType == Config.DEPOSIT) {
+					if(userController.getAccountDetail(username, toAccountNumber) instanceof CheckingAccount) {
+						accountType = Config.CHECKINGACCOUNT;
+					}
+					else if(userController.getAccountDetail(username, toAccountNumber) instanceof SavingAccount) {
+						accountType = Config.SAVINGACCOUNT;
+					}
 				}
-				else if(userController.getAccountDetail(username, fromAccountNumber) instanceof SavingAccount) {
-					accountType = Config.SAVINGACCOUNT;
+				else {
+					if(userController.getAccountDetail(username, fromAccountNumber) instanceof CheckingAccount) {
+						accountType = Config.CHECKINGACCOUNT;
+					}
+					else if(userController.getAccountDetail(username, fromAccountNumber) instanceof SavingAccount) {
+						accountType = Config.SAVINGACCOUNT;
+					}
 				}
 				
 				if(transactionType == Config.DEPOSIT) {

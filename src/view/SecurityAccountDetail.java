@@ -1,3 +1,9 @@
+/**
+ * @author Group 5
+ * @description  the interface for security account
+ * @system user
+ */
+
 package view;
 
 import controller.BankController;

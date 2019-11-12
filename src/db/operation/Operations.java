@@ -1,10 +1,6 @@
 /*
- * @Author: your name
- * @Date: 2019-11-05 20:14:51
- * @LastEditTime: 2019-11-10 15:51:18
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \NewFancyBank\src\db\operation\Tools.java
+ * @Author: Group 5
+ * @Description: This class includes some database operation
  */
 package db.operation;
 

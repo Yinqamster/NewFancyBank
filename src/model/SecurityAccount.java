@@ -1,3 +1,8 @@
+/**
+ * @author Group 5
+ * @description  This is security account which used to trade stocks
+ */
+
 package model;
 
 import java.math.BigDecimal;
