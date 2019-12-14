@@ -1,14 +1,6 @@
 ### Fancy Bank w/ Security Account
 
-Group \#5 members:
-
-
-| Name        | BUID      | kerbos ID |
-| ----------- | --------- | --------- |
-| Jiatong Hao | U42186937 | jthao     |
-| Jun Li      | U73344054 | junli     |
-| Jiaqian Sun | U48621793 | jiaqsun   |
-| Qi Yin      | U31787103 | yqueenie  |
+Group \#5
 
 
 
