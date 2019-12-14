@@ -49,8 +49,6 @@ public class StockMarket extends JFrame {
         logout.setBounds(452, 6, 35, 35);
         contentPanel.add(logout);
 
-
-
         Map<String, Stock> allStocks = BankController.getBank().getStockMap();
         int rows = allStocks == null || allStocks.size() == 0 ? 1 : allStocks.size() + 1;
         int scrollPaneHeight = rows * 30 > 300 ? 300 : rows * 30;
